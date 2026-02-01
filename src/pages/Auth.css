@@ -1,0 +1,212 @@
+/* Auth Page Layout */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 1.5rem 3rem;
+    background: var(--bg-primary);
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-mesh);
+    pointer-events: none;
+}
+
+/* Admin Page Variant */
+.admin-auth::before {
+    background:
+        radial-gradient(at 30% 30%, rgba(13, 148, 136, 0.15) 0px, transparent 50%),
+        radial-gradient(at 70% 70%, rgba(217, 119, 6, 0.1) 0px, transparent 50%);
+}
+
+/* Auth Container */
+.auth-container {
+    width: 100%;
+    max-width: 440px;
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: 3rem;
+    backdrop-filter: blur(20px);
+    position: relative;
+    z-index: 1;
+    box-shadow: var(--shadow-xl);
+}
+
+.auth-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
+}
+
+.admin-auth .auth-container::before {
+    background: linear-gradient(90deg, transparent, #14b8a6, transparent);
+}
+
+/* Auth Header */
+.auth-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.auth-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--bg-tertiary) 0%, #292524 100%);
+    border: 2px solid var(--glass-border);
+    border-radius: 50%;
+    font-size: 2.5rem;
+    box-shadow: 0 0 30px rgba(217, 119, 6, 0.2);
+    animation: float 4s ease-in-out infinite;
+}
+
+.admin-icon {
+    border-color: rgba(13, 148, 136, 0.4);
+    box-shadow: 0 0 30px rgba(13, 148, 136, 0.2);
+}
+
+.auth-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.auth-header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+/* Auth Form */
+.auth-form {
+    margin-bottom: 2rem;
+}
+
+.auth-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+/* Error Message */
+.auth-form .error-message {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* Admin Button Variant */
+.admin-btn {
+    background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #0d9488 100%);
+}
+
+.admin-btn:hover {
+    box-shadow: var(--shadow-lg), 0 0 50px rgba(13, 148, 136, 0.3);
+}
+
+/* Auth Footer */
+.auth-footer {
+    text-align: center;
+}
+
+.auth-footer p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.auth-footer a {
+    color: var(--primary-light);
+    font-weight: 600;
+    transition: color var(--transition-fast);
+}
+
+.auth-footer a:hover {
+    color: var(--primary-color);
+}
+
+.admin-auth .auth-footer a {
+    color: #14b8a6;
+}
+
+.admin-auth .auth-footer a:hover {
+    color: #0d9488;
+}
+
+/* Divider */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--glass-border);
+}
+
+.auth-divider span {
+    padding: 0 1rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Role Switch Links */
+.admin-link,
+.customer-link {
+    font-size: 0.9rem !important;
+    opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .auth-container {
+        padding: 2rem;
+    }
+
+    .auth-form .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .auth-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 2rem;
+    }
+}

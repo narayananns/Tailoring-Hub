@@ -1,0 +1,352 @@
+/* Mission Section */
+.mission-section {
+    background: transparent;
+}
+
+.mission-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 5rem;
+    align-items: center;
+}
+
+.mission-content h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 1.75rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.mission-content p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 1.25rem;
+}
+
+.mission-stats {
+    display: flex;
+    gap: 3rem;
+    margin-top: 2.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.mission-stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+}
+
+.stat-text {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.25rem;
+}
+
+.mission-image {
+    display: flex;
+    justify-content: center;
+}
+
+.image-placeholder {
+    background: linear-gradient(135deg, rgba(28, 25, 23, 0.95) 0%, rgba(41, 37, 36, 0.9) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: 5rem;
+    text-align: center;
+    width: 100%;
+    max-width: 380px;
+    position: relative;
+    overflow: hidden;
+}
+
+.image-placeholder::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
+}
+
+.image-placeholder span {
+    font-size: 7rem;
+    display: block;
+    margin-bottom: 1.5rem;
+    filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.3));
+    animation: float 4s ease-in-out infinite;
+}
+
+.image-placeholder p {
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.9rem;
+}
+
+/* Values Section */
+.values-section {
+    background: var(--bg-secondary);
+    position: relative;
+}
+
+.values-section::before,
+.values-section::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+}
+
+.values-section::before {
+    top: 0;
+}
+
+.values-section::after {
+    bottom: 0;
+}
+
+.value-card {
+    text-align: center;
+    padding: 3rem 2rem;
+    position: relative;
+}
+
+.value-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-full);
+    transition: width var(--transition-normal);
+}
+
+.value-card:hover::before {
+    width: 50%;
+}
+
+.value-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1.75rem;
+    filter: grayscale(20%);
+    transition: all var(--transition-normal);
+}
+
+.value-card:hover .value-icon {
+    filter: grayscale(0%);
+    transform: scale(1.15) rotate(5deg);
+}
+
+.value-card h3 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.875rem;
+    letter-spacing: -0.01em;
+}
+
+.value-card p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+/* Timeline Section - Unique Vertical Design */
+.timeline-section {
+    background: transparent;
+}
+
+.timeline {
+    max-width: 850px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 63px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary-color), var(--primary-light), var(--primary-color));
+}
+
+.timeline-item {
+    display: flex;
+    gap: 2.5rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+}
+
+.timeline-marker {
+    position: relative;
+    z-index: 1;
+}
+
+.timeline-year {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 75px;
+    height: 75px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: #1c1917;
+    box-shadow: 0 0 30px rgba(217, 119, 6, 0.4);
+    letter-spacing: -0.02em;
+}
+
+.timeline-content {
+    flex: 1;
+    padding: 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-normal);
+}
+
+.timeline-content:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(5px);
+}
+
+.timeline-content h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.625rem;
+    letter-spacing: -0.01em;
+}
+
+.timeline-content p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* Team Section */
+.team-section {
+    background: var(--bg-secondary);
+    position: relative;
+}
+
+.team-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+}
+
+.team-card {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.team-avatar {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--bg-tertiary) 0%, #292524 100%);
+    border: 2px solid var(--glass-border);
+    border-radius: 50%;
+    font-size: 3.5rem;
+    transition: all var(--transition-normal);
+}
+
+.team-card:hover .team-avatar {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 30px rgba(217, 119, 6, 0.2);
+    transform: scale(1.05);
+}
+
+.team-card h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.375rem;
+    letter-spacing: -0.01em;
+}
+
+.team-card p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+@media (max-width: 1024px) {
+    .mission-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .mission-image {
+        order: -1;
+    }
+
+    .mission-stats {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 640px) {
+    .mission-stats {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .timeline::before {
+        left: 38px;
+    }
+
+    .timeline-year {
+        width: 55px;
+        height: 55px;
+        font-size: 0.7rem;
+    }
+
+    .timeline-item {
+        gap: 1.5rem;
+    }
+
+    .timeline-content {
+        padding: 1.5rem;
+    }
+
+    .mission-content h2 {
+        font-size: 2rem;
+    }
+}
