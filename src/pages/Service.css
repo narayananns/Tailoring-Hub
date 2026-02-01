@@ -1,0 +1,251 @@
+/* Services Overview - Industrial Grid */
+.services-overview {
+    background: var(--bg-secondary);
+    position: relative;
+}
+
+.services-overview::before,
+.services-overview::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+}
+
+.services-overview::before {
+    top: 0;
+}
+
+.services-overview::after {
+    bottom: 0;
+}
+
+.services-grid {
+    margin-top: 2.5rem;
+}
+
+.service-card {
+    text-align: center;
+    padding: 3rem 2rem;
+    position: relative;
+}
+
+.service-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-full);
+    transition: width var(--transition-normal);
+}
+
+.service-card:hover::before {
+    width: 60%;
+}
+
+.service-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    filter: grayscale(20%);
+    transition: all var(--transition-normal);
+}
+
+.service-card:hover .service-icon {
+    filter: grayscale(0%);
+    transform: scale(1.15) rotate(5deg);
+}
+
+.service-card h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.875rem;
+    letter-spacing: -0.01em;
+}
+
+.service-card p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+}
+
+.service-price {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.625rem 1.25rem;
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--success-color);
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* Booking Section - Split Layout */
+.booking-section {
+    background: transparent;
+}
+
+.booking-container {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+}
+
+.booking-info {
+    padding: 3.5rem;
+    background: linear-gradient(160deg, rgba(28, 25, 23, 0.95) 0%, rgba(12, 10, 9, 0.98) 100%);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.booking-info::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-mesh);
+    opacity: 0.5;
+}
+
+.booking-info>* {
+    position: relative;
+    z-index: 1;
+}
+
+.booking-info h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.02em;
+}
+
+.booking-info>p {
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+.booking-features {
+    margin-top: auto;
+}
+
+.booking-feature {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.booking-feature span {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--success-color);
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.booking-feature p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.booking-form {
+    padding: 3.5rem;
+    background: var(--bg-tertiary);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+.btn-full {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 1.125rem 2rem;
+}
+
+/* Success Card */
+.success-card {
+    max-width: 520px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 4rem 3rem;
+}
+
+.success-icon {
+    font-size: 5rem;
+    margin-bottom: 2rem;
+    filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.3));
+}
+
+.success-card h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.02em;
+}
+
+.success-card p {
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+@media (max-width: 1024px) {
+    .booking-container {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-info {
+        padding: 2.5rem;
+    }
+
+    .booking-form {
+        padding: 2.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-info {
+        padding: 2rem;
+    }
+
+    .booking-form {
+        padding: 2rem;
+    }
+
+    .success-card {
+        padding: 3rem 1.5rem;
+    }
+}
