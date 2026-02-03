@@ -40,7 +40,16 @@ function CustomerLogin() {
                 localStorage.setItem('user', JSON.stringify(data.user))
                 navigate('/')
             } else {
-                setError(data.message || 'Login failed')
+                if (data.isVerified === false) {
+                    setError(
+                        <div>
+                            {data.message} <br/>
+                            <Link to="/verify-email" state={{ email: formData.email }} style={{color: 'white', textDecoration: 'underline'}}>Verify Now</Link>
+                        </div>
+                    )
+                } else {
+                    setError(data.message || 'Login failed')
+                }
             }
         } catch (err) {
             setError('Failed to connect to server')
@@ -98,6 +107,9 @@ function CustomerLogin() {
                     >
                         {isLoading ? 'Signing In...' : 'Sign In'}
                     </button>
+                    <div style={{marginTop: '10px', textAlign: 'center'}}>
+                         <Link to="/forgot-password" style={{color: '#666'}}>Forgot Password?</Link>
+                    </div>
                 </form>
 
                 <div className="auth-footer">
