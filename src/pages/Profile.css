@@ -200,3 +200,65 @@
         justify-content: center;
     }
 }
+/* New styles for profile photo features */
+.profile-avatar-container {
+    position: relative;
+    width: 100px;
+    margin: 0 auto 1.5rem;
+}
+
+.profile-avatar-large {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0; /* Override previous margin */
+}
+
+.profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-upload-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    border-radius: 50%;
+    border: 3px solid var(--bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s ease;
+    z-index: 2;
+}
+
+.profile-upload-btn:hover {
+    transform: scale(1.1);
+    background: var(--primary-light);
+}
+
+.profile-upload-btn.uploading {
+    cursor: wait;
+    opacity: 0.8;
+}
+
+.verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+

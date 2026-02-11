@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
         enum: ['customer', 'admin'],
         default: 'customer'
     },
+    accountId: {
+        type: String,
+        unique: true
+    },
     isVerified: {
         type: Boolean,
         default: false
@@ -39,10 +43,26 @@ const userSchema = new mongoose.Schema({
     otpExpires: {
         type: Date
     },
+    profilePhoto: {
+        type: String,
+        default: ''
+    },
     createdAt: {
         type: Date,
         default: Date.now
     }
+});
+
+// Generate Account ID before saving
+userSchema.pre('save', async function (next) {
+    if (!this.accountId) {
+        // Generate unique Account ID: TMMS + timestamp suffix (last 6 digits)
+        // This ensures uniqueness better than just random 4 digits
+        const timestamp = Date.now().toString().slice(-6);
+        const random = Math.floor(10 + Math.random() * 90); // 2 random digits
+        this.accountId = `TMMS-${timestamp}${random}`;
+    }
+    next();
 });
 
 // Hash password before saving

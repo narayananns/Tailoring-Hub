@@ -82,16 +82,25 @@ function Checkout() {
         // Check if user is logged in
         const token = localStorage.getItem('token')
         if (!token) {
-            // Redirect to login if not logged in
             alert('Please login to place an order')
             navigate('/customer/login')
             return
         }
 
+        // For Cash on Delivery, place order directly
+        if (formData.paymentMethod === 'cod') {
+            await placeOrderDirectly(token)
+            return
+        }
+
+        // For online payment (UPI/Card), use Razorpay
+        await initiateRazorpayPayment(token)
+    }
+
+    const placeOrderDirectly = async (token) => {
         setIsLoading(true)
 
         try {
-            // Send order to backend
             const response = await fetch('http://localhost:5000/api/orders/create', {
                 method: 'POST',
                 headers: {
@@ -117,7 +126,8 @@ function Checkout() {
                         pincode: formData.pincode
                     },
                     paymentMethod: formData.paymentMethod,
-                    totalAmount: getTotal()
+                    totalAmount: getTotal(),
+                    paymentStatus: 'pending'
                 })
             })
 
@@ -125,12 +135,9 @@ function Checkout() {
 
             if (response.ok) {
                 setOrderId(data.order.orderId)
-
-                // Clear cart and checkout items
                 localStorage.removeItem('cart')
                 localStorage.removeItem('checkoutItems')
                 window.dispatchEvent(new Event('cartUpdated'))
-
                 setOrderPlaced(true)
             } else {
                 alert(data.message || 'Failed to place order')
@@ -138,6 +145,159 @@ function Checkout() {
         } catch (error) {
             console.error('Order error:', error)
             alert('Failed to place order. Please try again.')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const initiateRazorpayPayment = async (token) => {
+        setIsLoading(true)
+
+        try {
+            // Step 1: Create Razorpay order
+            const orderResponse = await fetch('http://localhost:5000/api/payment/create-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    amount: getTotal(),
+                    currency: 'INR',
+                    receipt: `order_${Date.now()}`
+                })
+            })
+
+            const orderData = await orderResponse.json()
+
+            if (!orderResponse.ok || !orderData.success) {
+                throw new Error(orderData.message || 'Failed to create payment order')
+            }
+
+            // Step 2: Initialize Razorpay checkout
+            const options = {
+                key: orderData.key_id,
+                amount: orderData.order.amount,
+                currency: orderData.order.currency,
+                name: 'TMMS',
+                description: 'Payment for tailoring machines and parts',
+                order_id: orderData.order.id,
+                handler: async function (response) {
+                    // Payment successful - verify and create order
+                    await handlePaymentSuccess(response, token)
+                },
+                prefill: {
+                    name: formData.name,
+                    email: formData.email,
+                    contact: formData.phone
+                },
+                notes: {
+                    address: formData.address,
+                    city: formData.city,
+                    state: formData.state,
+                    pincode: formData.pincode
+                },
+                theme: {
+                    color: '#2563eb'
+                },
+                modal: {
+                    ondismiss: function () {
+                        setIsLoading(false)
+                        alert('Payment cancelled. Please try again.')
+                    }
+                }
+            }
+
+            const rzp = new window.Razorpay(options)
+
+            rzp.on('payment.failed', function (response) {
+                setIsLoading(false)
+                alert(`Payment failed: ${response.error.description}`)
+                console.error('Payment failed:', response.error)
+            })
+
+            setIsLoading(false)
+            rzp.open()
+
+        } catch (error) {
+            console.error('Payment initiation error:', error)
+            alert(error.message || 'Failed to initiate payment. Please try again.')
+            setIsLoading(false)
+        }
+    }
+
+    const handlePaymentSuccess = async (paymentResponse, token) => {
+        setIsLoading(true)
+
+        try {
+            // Step 1: Verify payment signature
+            const verifyResponse = await fetch('http://localhost:5000/api/payment/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    razorpay_order_id: paymentResponse.razorpay_order_id,
+                    razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                    razorpay_signature: paymentResponse.razorpay_signature
+                })
+            })
+
+            const verifyData = await verifyResponse.json()
+
+            if (!verifyResponse.ok || !verifyData.success) {
+                throw new Error('Payment verification failed')
+            }
+
+            // Step 2: Create order with payment details
+            const orderResponse = await fetch('http://localhost:5000/api/orders/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    items: checkoutItems.map(item => ({
+                        productId: item.id,
+                        name: item.name,
+                        price: item.price,
+                        quantity: item.quantity,
+                        type: item.type,
+                        image: item.image
+                    })),
+                    shippingDetails: {
+                        name: formData.name,
+                        phone: formData.phone,
+                        email: formData.email,
+                        address: formData.address,
+                        city: formData.city,
+                        state: formData.state,
+                        pincode: formData.pincode
+                    },
+                    paymentMethod: formData.paymentMethod,
+                    totalAmount: getTotal(),
+                    paymentStatus: 'completed',
+                    razorpayOrderId: paymentResponse.razorpay_order_id,
+                    razorpayPaymentId: paymentResponse.razorpay_payment_id,
+                    razorpaySignature: paymentResponse.razorpay_signature
+                })
+            })
+
+            const orderData = await orderResponse.json()
+
+            if (orderResponse.ok) {
+                setOrderId(orderData.order.orderId)
+                localStorage.removeItem('cart')
+                localStorage.removeItem('checkoutItems')
+                window.dispatchEvent(new Event('cartUpdated'))
+                setOrderPlaced(true)
+            } else {
+                throw new Error(orderData.message || 'Failed to create order')
+            }
+
+        } catch (error) {
+            console.error('Payment success handler error:', error)
+            alert('Payment was successful but order creation failed. Please contact support with payment ID: ' + paymentResponse.razorpay_payment_id)
         } finally {
             setIsLoading(false)
         }

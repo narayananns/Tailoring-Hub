@@ -66,10 +66,12 @@ app.use('/uploads', express.static(uploadsDir));
 // Import Routes
 const authRoutes = require('./routes/auth');
 const orderRoutes = require('./routes/orders');
+const paymentRoutes = require('./routes/payment');
 
 // Use Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/payment', paymentRoutes);
 
 // Basic route
 app.get('/api', (req, res) => {
@@ -78,6 +80,7 @@ app.get('/api', (req, res) => {
         version: '1.0.0',
         endpoints: {
             auth: '/api/auth',
+            payment: '/api/payment',
             machines: '/api/machines',
             spareParts: '/api/spare-parts',
             sellRequests: '/api/sell-requests',

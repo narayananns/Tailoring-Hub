@@ -1,5 +1,8 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const User = require('../models/User');
 const { sendOTP, sendWelcomeEmail } = require('../utils/emailService');
 
@@ -167,7 +170,10 @@ router.post('/customer/login', async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                phone: user.phone,
+                role: user.role,
+                profilePhoto: user.profilePhoto,
+                accountId: user.accountId
             }
         });
     } catch (error) {
@@ -303,7 +309,9 @@ router.post('/admin/login', async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                profilePhoto: user.profilePhoto,
+                accountId: user.accountId
             }
         });
     } catch (error) {
@@ -328,16 +336,128 @@ router.get('/verify', async (req, res) => {
             return res.status(401).json({ message: 'User not found' });
         }
 
+        // Generate Account ID if missing (for existing users)
+        if (!user.accountId) {
+             const timestamp = Date.now().toString().slice(-6);
+             const random = Math.floor(10 + Math.random() * 90);
+             user.accountId = `TMMS-${timestamp}${random}`;
+             await user.save();
+        }
+
         res.json({
             user: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                phone: user.phone,
+                role: user.role,
+                profilePhoto: user.profilePhoto,
+                accountId: user.accountId
             }
         });
     } catch (error) {
         res.status(401).json({ message: 'Invalid token' });
+    }
+});
+
+// Configure Multer for Profile Photos
+const uploadsDir = path.join(__dirname, '../uploads');
+// Ensure directory exists (redundant if server.js runs first, but safe)
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadsDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'user-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Not an image! Please upload an image.'), false);
+    }
+};
+
+const upload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+});
+
+// Create a protect middleware for internal use in this file
+const protect = async (req, res, next) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ message: 'Not authorized, no token' });
+        }
+        
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const user = await User.findById(decoded.id).select('-password');
+        
+        if (!user) {
+            return res.status(401).json({ message: 'User not found' });
+        }
+        
+        req.user = user;
+        next();
+    } catch (error) {
+        console.error('Auth middleware error:', error);
+        res.status(401).json({ message: 'Not authorized, token failed' });
+    }
+};
+
+// Wrapper for upload to handle errors and return JSON instead of HTML
+const uploadMiddleware = (req, res, next) => {
+    upload.single('photo')(req, res, (err) => {
+        if (err instanceof multer.MulterError) {
+            // A Multer error occurred when uploading.
+            return res.status(400).json({ message: `File upload error: ${err.message}` });
+        } else if (err) {
+            // An unknown error occurred when uploading.
+            return res.status(400).json({ message: err.message });
+        }
+        // Everything went fine.
+        next();
+    });
+};
+
+// Update Profile Photo
+router.put('/profile/photo', protect, uploadMiddleware, async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'Please upload a file' });
+        }
+
+        const user = req.user;
+        
+        // Optional: Delete old photo if it exists and is a local file
+        if (user.profilePhoto && user.profilePhoto.startsWith('/uploads/user-')) {
+             const oldPath = path.join(__dirname, '..', user.profilePhoto);
+             try {
+                if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+             } catch (err) {
+                 console.error('Error deleting old photo:', err);
+             }
+        }
+
+        user.profilePhoto = `/uploads/${req.file.filename}`;
+        await user.save();
+
+        res.json({
+            message: 'Profile photo updated successfully',
+            profilePhoto: user.profilePhoto
+        });
+    } catch (error) {
+        console.error('Profile upload error:', error);
+        res.status(500).json({ message: 'Error uploading photo', error: error.message });
     }
 });
 
