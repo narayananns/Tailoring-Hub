@@ -16,7 +16,7 @@ TMMS is an academic project designed to help a tailoring machine business manage
 - **Database**: MongoDB
 - **Styling**: Vanilla CSS with modern design system
 
-## 📁 Project Structure
+## 📁 Project Structures.
 
 ```
 cons/
