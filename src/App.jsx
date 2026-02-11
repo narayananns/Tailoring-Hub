@@ -9,9 +9,12 @@ import About from './pages/About'
 import Contact from './pages/Contact'
 import CustomerLogin from './pages/CustomerLogin'
 import CustomerSignup from './pages/CustomerSignup'
+<<<<<<< HEAD
 import VerifyEmail from './pages/VerifyEmail'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+=======
+>>>>>>> origin/main
 import AdminLogin from './pages/AdminLogin'
 import AdminSignup from './pages/AdminSignup'
 import Profile from './pages/Profile'
@@ -35,9 +38,12 @@ function App() {
           {/* Customer Auth Routes */}
           <Route path="/customer/login" element={<CustomerLogin />} />
           <Route path="/customer/signup" element={<CustomerSignup />} />
+<<<<<<< HEAD
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+=======
+>>>>>>> origin/main
           {/* Admin Auth Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/signup" element={<AdminSignup />} />

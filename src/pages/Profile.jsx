@@ -4,6 +4,7 @@ import './Profile.css'
 
 function Profile() {
     const [user, setUser] = useState(null)
+<<<<<<< HEAD
     const [loading, setLoading] = useState(true)
     const [uploading, setUploading] = useState(false)
     const navigate = useNavigate()
@@ -96,6 +97,30 @@ function Profile() {
             setUploading(false)
         }
     }
+=======
+    const [isEditing, setIsEditing] = useState(false)
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: ''
+    })
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user')
+        if (storedUser) {
+            const userData = JSON.parse(storedUser)
+            setUser(userData)
+            setFormData({
+                name: userData.name || '',
+                email: userData.email || '',
+                phone: userData.phone || ''
+            })
+        } else {
+            navigate('/customer/login')
+        }
+    }, [navigate])
+>>>>>>> origin/main
 
     const handleLogout = () => {
         localStorage.removeItem('token')
@@ -103,7 +128,11 @@ function Profile() {
         navigate('/')
     }
 
+<<<<<<< HEAD
     if (loading) {
+=======
+    if (!user) {
+>>>>>>> origin/main
         return (
             <div className="profile-page">
                 <div className="profile-loading">Loading...</div>
@@ -111,12 +140,16 @@ function Profile() {
         )
     }
 
+<<<<<<< HEAD
     if (!user) return null
 
+=======
+>>>>>>> origin/main
     return (
         <div className="profile-page">
             <div className="profile-container">
                 <div className="profile-header">
+<<<<<<< HEAD
                     <div className="profile-avatar-container">
                         <div className="profile-avatar-large">
                             {user.profilePhoto ? (
@@ -150,6 +183,10 @@ function Profile() {
                         >
                             {uploading ? '⏳' : '📷'}
                         </label>
+=======
+                    <div className="profile-avatar-large">
+                        {user.role === 'admin' ? '🔐' : '👤'}
+>>>>>>> origin/main
                     </div>
                     <h1>My Profile</h1>
                     <p className="profile-subtitle">Manage your account information</p>
@@ -170,6 +207,7 @@ function Profile() {
                                 <div className="profile-value">{user.email}</div>
                             </div>
 
+<<<<<<< HEAD
                             {user.phone && (
                                 <div className="profile-field">
                                     <label>Phone Number</label>
@@ -177,6 +215,8 @@ function Profile() {
                                 </div>
                             )}
 
+=======
+>>>>>>> origin/main
                             <div className="profile-field">
                                 <label>Account Type</label>
                                 <div className="profile-value">
@@ -188,6 +228,7 @@ function Profile() {
 
                             <div className="profile-field">
                                 <label>Account ID</label>
+<<<<<<< HEAD
                                 <div className="profile-value profile-id" style={{ fontFamily: 'monospace', letterSpacing: '1px', color: 'var(--primary)' }}>
                                     {user.accountId}
                                 </div>
@@ -200,6 +241,9 @@ function Profile() {
                                         ✅ Verified
                                     </span>
                                 </div>
+=======
+                                <div className="profile-value profile-id">{user.id}</div>
+>>>>>>> origin/main
                             </div>
                         </div>
                     </div>

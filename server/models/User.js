@@ -29,10 +29,13 @@ const userSchema = new mongoose.Schema({
         enum: ['customer', 'admin'],
         default: 'customer'
     },
+<<<<<<< HEAD
     accountId: {
         type: String,
         unique: true
     },
+=======
+>>>>>>> origin/main
     isVerified: {
         type: Boolean,
         default: false
@@ -43,16 +46,20 @@ const userSchema = new mongoose.Schema({
     otpExpires: {
         type: Date
     },
+<<<<<<< HEAD
     profilePhoto: {
         type: String,
         default: ''
     },
+=======
+>>>>>>> origin/main
     createdAt: {
         type: Date,
         default: Date.now
     }
 });
 
+<<<<<<< HEAD
 // Generate Account ID before saving
 userSchema.pre('save', async function (next) {
     if (!this.accountId) {
@@ -65,6 +72,8 @@ userSchema.pre('save', async function (next) {
     next();
 });
 
+=======
+>>>>>>> origin/main
 // Hash password before saving
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();

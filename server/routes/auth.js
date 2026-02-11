@@ -1,8 +1,11 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+<<<<<<< HEAD
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+=======
+>>>>>>> origin/main
 const User = require('../models/User');
 const { sendOTP, sendWelcomeEmail } = require('../utils/emailService');
 
@@ -170,10 +173,14 @@ router.post('/customer/login', async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+<<<<<<< HEAD
                 phone: user.phone,
                 role: user.role,
                 profilePhoto: user.profilePhoto,
                 accountId: user.accountId
+=======
+                role: user.role
+>>>>>>> origin/main
             }
         });
     } catch (error) {
@@ -309,9 +316,13 @@ router.post('/admin/login', async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+<<<<<<< HEAD
                 role: user.role,
                 profilePhoto: user.profilePhoto,
                 accountId: user.accountId
+=======
+                role: user.role
+>>>>>>> origin/main
             }
         });
     } catch (error) {
@@ -336,6 +347,7 @@ router.get('/verify', async (req, res) => {
             return res.status(401).json({ message: 'User not found' });
         }
 
+<<<<<<< HEAD
         // Generate Account ID if missing (for existing users)
         if (!user.accountId) {
              const timestamp = Date.now().toString().slice(-6);
@@ -344,15 +356,21 @@ router.get('/verify', async (req, res) => {
              await user.save();
         }
 
+=======
+>>>>>>> origin/main
         res.json({
             user: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+<<<<<<< HEAD
                 phone: user.phone,
                 role: user.role,
                 profilePhoto: user.profilePhoto,
                 accountId: user.accountId
+=======
+                role: user.role
+>>>>>>> origin/main
             }
         });
     } catch (error) {
@@ -360,6 +378,7 @@ router.get('/verify', async (req, res) => {
     }
 });
 
+<<<<<<< HEAD
 // Configure Multer for Profile Photos
 const uploadsDir = path.join(__dirname, '../uploads');
 // Ensure directory exists (redundant if server.js runs first, but safe)
@@ -461,4 +480,6 @@ router.put('/profile/photo', protect, uploadMiddleware, async (req, res) => {
     }
 });
 
+=======
+>>>>>>> origin/main
 module.exports = router;

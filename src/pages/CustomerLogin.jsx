@@ -40,6 +40,7 @@ function CustomerLogin() {
                 localStorage.setItem('user', JSON.stringify(data.user))
                 navigate('/')
             } else {
+<<<<<<< HEAD
                 if (data.isVerified === false) {
                     setError(
                         <div>
@@ -50,6 +51,9 @@ function CustomerLogin() {
                 } else {
                     setError(data.message || 'Login failed')
                 }
+=======
+                setError(data.message || 'Login failed')
+>>>>>>> origin/main
             }
         } catch (err) {
             setError('Failed to connect to server')
@@ -107,9 +111,12 @@ function CustomerLogin() {
                     >
                         {isLoading ? 'Signing In...' : 'Sign In'}
                     </button>
+<<<<<<< HEAD
                     <div style={{marginTop: '10px', textAlign: 'center'}}>
                          <Link to="/forgot-password" style={{color: '#666'}}>Forgot Password?</Link>
                     </div>
+=======
+>>>>>>> origin/main
                 </form>
 
                 <div className="auth-footer">
