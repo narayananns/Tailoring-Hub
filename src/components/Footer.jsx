@@ -49,7 +49,6 @@ function Footer() {
 
                 <div className="footer-bottom">
                     <p>© {currentYear} Running Trader. All rights reserved.</p>
-                    <p className="footer-note">Academic Project</p>
                 </div>
             </div>
         </footer>

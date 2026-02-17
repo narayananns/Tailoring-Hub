@@ -82,16 +82,11 @@ function Checkout() {
         // Check if user is logged in
         const token = localStorage.getItem('token')
         if (!token) {
-<<<<<<< HEAD
-=======
-            // Redirect to login if not logged in
->>>>>>> origin/main
             alert('Please login to place an order')
             navigate('/customer/login')
             return
         }
 
-<<<<<<< HEAD
         // For Cash on Delivery, place order directly
         if (formData.paymentMethod === 'cod') {
             await placeOrderDirectly(token)
@@ -106,12 +101,6 @@ function Checkout() {
         setIsLoading(true)
 
         try {
-=======
-        setIsLoading(true)
-
-        try {
-            // Send order to backend
->>>>>>> origin/main
             const response = await fetch('http://localhost:5000/api/orders/create', {
                 method: 'POST',
                 headers: {
@@ -137,12 +126,8 @@ function Checkout() {
                         pincode: formData.pincode
                     },
                     paymentMethod: formData.paymentMethod,
-<<<<<<< HEAD
                     totalAmount: getTotal(),
                     paymentStatus: 'pending'
-=======
-                    totalAmount: getTotal()
->>>>>>> origin/main
                 })
             })
 
@@ -150,18 +135,9 @@ function Checkout() {
 
             if (response.ok) {
                 setOrderId(data.order.orderId)
-<<<<<<< HEAD
                 localStorage.removeItem('cart')
                 localStorage.removeItem('checkoutItems')
                 window.dispatchEvent(new Event('cartUpdated'))
-=======
-
-                // Clear cart and checkout items
-                localStorage.removeItem('cart')
-                localStorage.removeItem('checkoutItems')
-                window.dispatchEvent(new Event('cartUpdated'))
-
->>>>>>> origin/main
                 setOrderPlaced(true)
             } else {
                 alert(data.message || 'Failed to place order')
@@ -174,7 +150,6 @@ function Checkout() {
         }
     }
 
-<<<<<<< HEAD
     const initiateRazorpayPayment = async (token) => {
         setIsLoading(true)
 
@@ -328,8 +303,6 @@ function Checkout() {
         }
     }
 
-=======
->>>>>>> origin/main
     if (orderPlaced) {
         return (
             <div className="checkout-page">

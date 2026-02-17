@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 const brevo = require('@getbrevo/brevo');
 
 // Configure API key authorization: api-key
@@ -49,8 +48,8 @@ const sendEmail = async (to, subject, htmlContent) => {
 
     sendSmtpEmail.subject = subject;
     sendSmtpEmail.htmlContent = htmlContent;
-    sendSmtpEmail.sender = { 
-        name: "TMMS Support", 
+    sendSmtpEmail.sender = {
+        name: "TMMS Support",
         email: process.env.BREVO_USER // validation email (ensure this is authorized in Brevo)
     };
     sendSmtpEmail.to = [{ email: to }];
@@ -61,42 +60,16 @@ const sendEmail = async (to, subject, htmlContent) => {
         return data;
     } catch (error) {
         console.error('Error calling Brevo API:', error);
-=======
-const nodemailer = require('nodemailer');
-
-const transporter = nodemailer.createTransport({
-    host: 'smtp-relay.brevo.com',
-    port: 587,
-    auth: {
-        user: process.env.BREVO_USER,
-        pass: process.env.BREVO_PASS
-    }
-});
-
-const sendEmail = async (to, subject, html) => {
-    try {
-        const info = await transporter.sendMail({
-            from: `"TMMS Support" <${process.env.BREVO_USER}>`, // sender address
-            to, 
-            subject, 
-            html 
-        });
-        console.log("Message sent: %s", info.messageId);
-        return info;
-    } catch (error) {
-        console.error("Error sending email: ", error);
->>>>>>> origin/main
         throw error;
     }
 };
 
 const sendOTP = async (email, otp, type = 'verification') => {
-<<<<<<< HEAD
     const title = type === 'verification' ? 'Email Verification' : 'Password Reset';
-    const message = type === 'verification' 
-        ? 'Please use the verification code below to activate your account.' 
+    const message = type === 'verification'
+        ? 'Please use the verification code below to activate your account.'
         : 'You requested a password reset. Use the code below to reset your password.';
-    
+
     const content = `
         <h2 style="color: #2c3e50; margin-top: 0;">${title}</h2>
         <p>Hello,</p>
@@ -130,33 +103,6 @@ const sendWelcomeEmail = async (email, name) => {
     `;
 
     return sendEmail(email, 'Welcome to TMMS! 🧵', getEmailTemplate(content, title));
-=======
-    const subject = type === 'verification' 
-        ? 'Verify Your Email - TMMS' 
-        : 'Password Reset OTP - TMMS';
-        
-    const html = `
-        <div style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2>${type === 'verification' ? 'Email Verification' : 'Password Reset'}</h2>
-            <p>Your OTP is: <strong style="font-size: 24px; color: #4CAF50;">${otp}</strong></p>
-            <p>This OTP is valid for 10 minutes.</p>
-            <p>If you did not request this, please ignore this email.</p>
-        </div>
-    `;
-    return sendEmail(email, subject, html);
-};
-
-const sendWelcomeEmail = async (email, name) => {
-    const subject = 'Welcome to TMMS!';
-    const html = `
-        <div style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2>Welcome, ${name}!</h2>
-            <p>Thank you for registering with Tailoring Machine Management System.</p>
-            <p>We are excited to have you on board.</p>
-        </div>
-    `;
-    return sendEmail(email, subject, html);
->>>>>>> origin/main
 };
 
 module.exports = {

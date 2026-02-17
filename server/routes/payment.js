@@ -18,21 +18,26 @@ const verifyToken = async (req, res, next) => {
     try {
         const token = req.header('Authorization')?.replace('Bearer ', '');
         if (!token) {
+            console.log('Payment Auth: No token provided');
             return res.status(401).json({ message: 'Authentication required' });
         }
 
         const decoded = jwt.verify(token, JWT_SECRET);
+        // console.log('Payment Auth: Token decoded', decoded);
+
         const user = await User.findById(decoded.id);
 
         if (!user) {
+            console.log('Payment Auth: User not found for id', decoded.id);
             return res.status(401).json({ message: 'User not found' });
         }
 
         req.user = user;
         next();
     } catch (error) {
-        console.error('Payment auth error:', error);
-        res.status(401).json({ message: 'Invalid token' });
+        console.error('Payment auth error:', error.message);
+        // console.error('Token causing error:', req.header('Authorization'));
+        res.status(401).json({ message: 'Invalid token', error: error.message });
     }
 };
 

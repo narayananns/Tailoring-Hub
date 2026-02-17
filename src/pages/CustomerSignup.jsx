@@ -1,17 +1,10 @@
-<<<<<<< HEAD
 import { useState, useEffect } from 'react'
-=======
-import { useState } from 'react'
->>>>>>> origin/main
 import { Link, useNavigate } from 'react-router-dom'
 import './Auth.css'
 
 function CustomerSignup() {
     const navigate = useNavigate()
-<<<<<<< HEAD
     const [step, setStep] = useState(1) // 1: Details, 2: Verification
-=======
->>>>>>> origin/main
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -19,7 +12,6 @@ function CustomerSignup() {
         password: '',
         confirmPassword: ''
     })
-<<<<<<< HEAD
     const [otp, setOtp] = useState('')
     const [error, setError] = useState('')
     const [successMessage, setSuccessMessage] = useState('')
@@ -35,10 +27,6 @@ function CustomerSignup() {
         }
         return () => clearInterval(interval)
     }, [resendTimer])
-=======
-    const [error, setError] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
->>>>>>> origin/main
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -49,11 +37,7 @@ function CustomerSignup() {
         setError('')
     }
 
-<<<<<<< HEAD
     const handleSignupSubmit = async (e) => {
-=======
-    const handleSubmit = async (e) => {
->>>>>>> origin/main
         e.preventDefault()
         setIsLoading(true)
         setError('')
@@ -88,7 +72,6 @@ function CustomerSignup() {
             const data = await response.json()
 
             if (response.ok) {
-<<<<<<< HEAD
                 setStep(2)
                 setSuccessMessage('Account created! Please enter the code sent to your email.')
                 setResendTimer(60)
@@ -156,13 +139,6 @@ function CustomerSignup() {
                 setResendTimer(60)
             } else {
                 setError('Failed to resend code')
-=======
-                localStorage.setItem('token', data.token)
-                localStorage.setItem('user', JSON.stringify(data.user))
-                navigate('/')
-            } else {
-                setError(data.message || 'Registration failed')
->>>>>>> origin/main
             }
         } catch (err) {
             setError('Failed to connect to server')
@@ -175,7 +151,6 @@ function CustomerSignup() {
         <div className="auth-page">
             <div className="auth-container">
                 <div className="auth-header">
-<<<<<<< HEAD
                     <div className="auth-icon">{step === 1 ? '🧵' : '✉️'}</div>
                     <h1>{step === 1 ? 'Create Account' : 'Verify Email'}</h1>
                     <p>{step === 1 ? 'Join us and start exploring our machines' : `Enter the code sent to ${formData.email}`}</p>
@@ -261,7 +236,7 @@ function CustomerSignup() {
                         >
                             {isLoading ? 'Creating Account...' : 'Sign Up & Verify'}
                         </button>
-                        
+
                         <div className="auth-footer">
                             <p>Already have an account? <Link to="/customer/login">Sign In</Link></p>
                         </div>
@@ -270,7 +245,7 @@ function CustomerSignup() {
                     <form className="auth-form" onSubmit={handleVerifySubmit}>
                         <div className="form-group">
                             <label className="form-label">Verification Code</label>
-                            <div style={{display: 'flex', gap: '10px'}}>
+                            <div style={{ display: 'flex', gap: '10px' }}>
                                 <input
                                     type="text"
                                     className="form-input"
@@ -305,7 +280,7 @@ function CustomerSignup() {
                         </div>
 
                         {error && <div className="error-message">{error}</div>}
-                        {successMessage && <div className="success-message" style={{color: 'green', textAlign: 'center', marginBottom: '1rem'}}>{successMessage}</div>}
+                        {successMessage && <div className="success-message" style={{ color: 'green', textAlign: 'center', marginBottom: '1rem' }}>{successMessage}</div>}
 
                         <button
                             type="submit"
@@ -318,7 +293,7 @@ function CustomerSignup() {
                         <button
                             type="button"
                             className="btn btn-secondary btn-full"
-                            style={{marginTop: '1rem', background: '#f8f9fa', color: '#333', border: '1px solid #ddd'}}
+                            style={{ marginTop: '1rem', background: '#f8f9fa', color: '#333', border: '1px solid #ddd' }}
                             onClick={() => setStep(1)}
                             disabled={isLoading}
                         >
@@ -326,97 +301,6 @@ function CustomerSignup() {
                         </button>
                     </form>
                 )}
-=======
-                    <div className="auth-icon">🧵</div>
-                    <h1>Create Account</h1>
-                    <p>Join us and start exploring our machines</p>
-                </div>
-
-                <form className="auth-form" onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label className="form-label">Full Name</label>
-                        <input
-                            type="text"
-                            name="name"
-                            className="form-input"
-                            placeholder="Enter your full name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Email Address</label>
-                        <input
-                            type="email"
-                            name="email"
-                            className="form-input"
-                            placeholder="Enter your email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Phone Number</label>
-                        <input
-                            type="tel"
-                            name="phone"
-                            className="form-input"
-                            placeholder="Enter your phone number"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Password</label>
-                        <input
-                            type="password"
-                            name="password"
-                            className="form-input"
-                            placeholder="Create a password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Confirm Password</label>
-                        <input
-                            type="password"
-                            name="confirmPassword"
-                            className="form-input"
-                            placeholder="Confirm your password"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    {error && (
-                        <div className="error-message">
-                            {error}
-                        </div>
-                    )}
-
-                    <button
-                        type="submit"
-                        className="btn btn-primary btn-full"
-                        disabled={isLoading}
-                    >
-                        {isLoading ? 'Creating Account...' : 'Create Account'}
-                    </button>
-                </form>
-
-                <div className="auth-footer">
-                    <p>Already have an account? <Link to="/customer/login">Sign In</Link></p>
-                </div>
->>>>>>> origin/main
             </div>
         </div>
     )
