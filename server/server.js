@@ -67,11 +67,15 @@ app.use('/uploads', express.static(uploadsDir));
 const authRoutes = require('./routes/auth');
 const orderRoutes = require('./routes/orders');
 const paymentRoutes = require('./routes/payment');
+const sellRoutes = require('./routes/sell');
+const serviceRoutes = require('./routes/service');
 
 // Use Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/sell-requests', sellRoutes);
+app.use('/api/service-bookings', serviceRoutes);
 
 // Basic route
 app.get('/api', (req, res) => {
@@ -102,31 +106,6 @@ app.get('/api/spare-parts', (req, res) => {
     res.json({
         message: 'Spare parts endpoint',
         data: []
-    });
-});
-
-// Sell request with photo upload
-app.post('/api/sell-requests', upload.array('photos', 5), (req, res) => {
-    console.log('Sell request received:', req.body);
-    console.log('Files uploaded:', req.files?.length || 0);
-
-    // Get uploaded file paths
-    const photoUrls = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
-
-    res.json({
-        message: 'Sell request received successfully',
-        data: {
-            ...req.body,
-            photos: photoUrls
-        }
-    });
-});
-
-app.post('/api/service-bookings', (req, res) => {
-    console.log('Service booking received:', req.body);
-    res.json({
-        message: 'Service booking received successfully',
-        data: req.body
     });
 });
 

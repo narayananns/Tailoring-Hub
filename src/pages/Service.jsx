@@ -25,10 +25,38 @@ function Service() {
         }))
     }
 
-    const handleSubmit = (e) => {
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [error, setError] = useState('')
+
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log('Service request submitted:', formData)
-        setSubmitted(true)
+        setIsSubmitting(true)
+        setError('')
+
+        try {
+            const response = await fetch('http://localhost:5000/api/service-bookings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+
+            const data = await response.json()
+
+            if (response.ok) {
+                setSubmitted(true)
+            } else {
+                setError(data.message || 'Failed to submit service request')
+                alert(data.message || 'Failed to submit service request')
+            }
+        } catch (err) {
+            console.error('Error submitting service request:', err)
+            setError('An error occurred. Please try again later.')
+            alert('An error occurred. Please try again later.')
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     const services = [

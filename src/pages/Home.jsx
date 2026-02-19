@@ -39,11 +39,11 @@ function Home() {
                     <div className="hero-content">
                         <span className="hero-badge">
                             <span className="badge-dot"></span>
-                            Trusted Since 2024
+                            Trusted Since 1997
                         </span>
                         <h1 className="hero-title">
-                            Tailoring Machine <br />
-                            <span className="gradient-text">Management System</span>
+                            Running Traders <br />
+                            
                         </h1>
                         <p className="hero-description">
                             Your one-stop solution for buying, selling, and servicing industrial tailoring machines.

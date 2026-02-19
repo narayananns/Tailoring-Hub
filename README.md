@@ -1,4 +1,6 @@
 # TMMS - Tailoring Machine Management System
+netstat -ano | findstr :5000
+taskkill /F /PID 17852
 
 A full-stack web application for managing tailoring machines - buy, sell, and service.
 
