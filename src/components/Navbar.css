@@ -4,16 +4,22 @@
     left: 0;
     right: 0;
     z-index: 1000;
-    background: rgba(12, 10, 9, 0.85);
-    backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid var(--glass-border);
+    background-color: var(--bg-secondary); /* Restored user-side color */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 1rem 0;
-    transition: all var(--transition-normal);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
+.navbar.admin-navbar {
+    background-color: #2c3e50; /* Admin-specific color */
+}
+
+/* Scrolled state handled by JS (if implemented) */
 .navbar.scrolled {
-    background: rgba(12, 10, 9, 0.95);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    background-color: var(--bg-secondary);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
 }
 
 .navbar-container {
@@ -43,59 +49,41 @@
 }
 
 .brand-text {
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.02em;
+    color: white; /* Changed from gradient to white */
+    font-weight: 700;
 }
 
 .navbar-menu {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 1rem; /* Increased gap for better spacing */
 }
 
 .nav-link {
-    position: relative;
     padding: 0.75rem 1.25rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--text-secondary);
+    font-size: 0.95rem;
     text-decoration: none;
-    border-radius: var(--radius-md);
-    transition: all var(--transition-fast);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: 0.5rem;
-    left: 50%;
-    width: 0;
-    height: 2px;
-    background: var(--gradient-primary);
-    border-radius: var(--radius-full);
-    transform: translateX(-50%);
-    transition: width var(--transition-normal);
+    border-radius: 6px;
+    color: #cbd5e1;
+    text-transform: capitalize; 
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px; /* Optional: ensures a minimum width for equality */
+    text-align: center;
 }
 
 .nav-link:hover {
-    color: var(--text-primary);
-}
-
-.nav-link:hover::after {
-    width: calc(100% - 2rem);
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .nav-link.active {
-    color: var(--primary-light);
-}
-
-.nav-link.active::after {
-    width: calc(100% - 2rem);
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
 }
 
 .navbar-toggle {

@@ -83,9 +83,9 @@ function Navbar() {
     }, [])
 
     return (
-        <nav className="navbar">
+        <nav className={`navbar ${user?.role === 'admin' ? 'admin-navbar' : ''}`}>
             <div className="container navbar-container">
-                <Link to="/" className="navbar-brand" onClick={closeMenu}>
+                <Link to={user?.role === 'admin' ? "/admin/dashboard" : "/"} className="navbar-brand" onClick={closeMenu}>
                     <span className="brand-icon">⚙️</span>
                     <span className="brand-text">Running Trader</span>
                 </Link>
@@ -95,33 +95,57 @@ function Navbar() {
                 </button>
 
                 <div className={`navbar-menu ${isMenuOpen ? 'active' : ''}`}>
-                    <NavLink to="/" className="nav-link" onClick={closeMenu}>
-                        Home
-                    </NavLink>
-                    <NavLink to="/buy" className="nav-link" onClick={closeMenu}>
-                        Buy
-                    </NavLink>
-                    <NavLink to="/sell" className="nav-link" onClick={closeMenu}>
-                        Sell
-                    </NavLink>
-                    <NavLink to="/service" className="nav-link" onClick={closeMenu}>
-                        Service
-                    </NavLink>
-                    <NavLink to="/about" className="nav-link" onClick={closeMenu}>
-                        About
-                    </NavLink>
-                    <NavLink to="/contact" className="nav-link" onClick={closeMenu}>
-                        Contact
-                    </NavLink>
+                    {user?.role === 'admin' ? (
+                        <>
+                            <NavLink to="/admin/dashboard?tab=overview" className="nav-link" onClick={closeMenu}>
+                                Dashboard
+                            </NavLink>
+                            <NavLink to="/admin/dashboard?tab=inventory" className="nav-link" onClick={closeMenu}>
+                                Inventory
+                            </NavLink>
+                            <NavLink to="/admin/dashboard?tab=sell-requests" className="nav-link" onClick={closeMenu}>
+                                Sell Requests
+                            </NavLink>
+                            <NavLink to="/admin/dashboard?tab=service-bookings" className="nav-link" onClick={closeMenu}>
+                                Services
+                            </NavLink>
+                            <NavLink to="/admin/dashboard?tab=contacts" className="nav-link" onClick={closeMenu}>
+                                Messages
+                            </NavLink>
+                        </>
+                    ) : (
+                        <>
+                            <NavLink to="/" className="nav-link" onClick={closeMenu}>
+                                Home
+                            </NavLink>
+                            <NavLink to="/buy" className="nav-link" onClick={closeMenu}>
+                                Buy
+                            </NavLink>
+                            <NavLink to="/sell" className="nav-link" onClick={closeMenu}>
+                                Sell
+                            </NavLink>
+                            <NavLink to="/service" className="nav-link" onClick={closeMenu}>
+                                Service
+                            </NavLink>
+                            <NavLink to="/about" className="nav-link" onClick={closeMenu}>
+                                About
+                            </NavLink>
+                            <NavLink to="/contact" className="nav-link" onClick={closeMenu}>
+                                Contact
+                            </NavLink>
+                        </>
+                    )}
 
                     <div className="nav-auth">
-                        {/* Cart Icon */}
-                        <Link to="/cart" className="cart-link" onClick={closeMenu}>
-                            <span className="cart-icon">🛒</span>
-                            {cartCount > 0 && (
-                                <span className="cart-badge">{cartCount}</span>
-                            )}
-                        </Link>
+                        {/* Cart Icon - Hide for Admin */}
+                        {user?.role !== 'admin' && (
+                            <Link to="/cart" className="cart-link" onClick={closeMenu}>
+                                <span className="cart-icon">🛒</span>
+                                {cartCount > 0 && (
+                                    <span className="cart-badge">{cartCount}</span>
+                                )}
+                            </Link>
+                        )}
 
                         {user ? (
                             <div className="profile-dropdown-container">
@@ -149,9 +173,11 @@ function Navbar() {
                                         <Link to="/profile" className="profile-dropdown-item" onClick={closeMenu}>
                                             <span>👤</span> My Profile
                                         </Link>
-                                        <Link to="/my-orders" className="profile-dropdown-item" onClick={closeMenu}>
-                                            <span>📦</span> My Orders
-                                        </Link>
+                                        {user.role !== 'admin' && (
+                                            <Link to="/my-orders" className="profile-dropdown-item" onClick={closeMenu}>
+                                                <span>📦</span> My Orders
+                                            </Link>
+                                        )}
                                         <button className="profile-dropdown-item logout" onClick={handleLogout}>
                                             <span>🚪</span> Logout
                                         </button>

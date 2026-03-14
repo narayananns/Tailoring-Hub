@@ -40,4 +40,28 @@ router.get('/', async (req, res) => {
     }
 });
 
+// @route   PUT /api/service-bookings/:id/status
+// @desc    Update service booking status
+// @access  Private (Admin)
+router.put('/:id/status', async (req, res) => {
+    try {
+        const { status } = req.body;
+        
+        const booking = await ServiceBooking.findByIdAndUpdate(
+            req.params.id,
+            { status },
+            { new: true, runValidators: true }
+        );
+
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        res.json(booking);
+    } catch (error) {
+        console.error('Error updating status:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
 module.exports = router;

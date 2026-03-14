@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import axios from 'axios'
+import toast from 'react-hot-toast'
 import './Contact.css'
 
 function Contact() {
@@ -10,6 +12,7 @@ function Contact() {
         message: ''
     })
 
+    const [loading, setLoading] = useState(false)
     const [submitted, setSubmitted] = useState(false)
 
     const handleChange = (e) => {
@@ -20,10 +23,36 @@ function Contact() {
         }))
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log('Contact form submitted:', formData)
-        setSubmitted(true)
+        setLoading(true)
+
+        if (formData.phone && !/^\d{10}$/.test(formData.phone)) {
+            toast.error('Phone number must be exactly 10 digits')
+            setLoading(false)
+            return
+        }
+
+        try {
+            const response = await axios.post('/api/contacts', formData)
+            
+            if (response.data) {
+                toast.success('Message sent successfully!')
+                setSubmitted(true)
+                setFormData({
+                    name: '',
+                    email: '',
+                    phone: '',
+                    subject: '',
+                    message: ''
+                })
+            }
+        } catch (error) {
+            console.error('Error sending message:', error)
+            toast.error(error.response?.data?.message || 'Failed to send message. Please try again.')
+        } finally {
+            setLoading(false)
+        }
     }
 
     const contactInfo = [
@@ -188,8 +217,12 @@ function Contact() {
                                     ></textarea>
                                 </div>
 
-                                <button type="submit" className="btn btn-primary btn-full">
-                                    Send Message
+                                <button 
+                                    type="submit" 
+                                    className="btn btn-primary btn-full"
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Sending...' : 'Send Message'}
                                 </button>
                             </form>
                         </div>

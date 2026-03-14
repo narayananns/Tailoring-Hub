@@ -51,11 +51,11 @@ const sellRequestSchema = new mongoose.Schema({
         required: [true, 'Expected price is required']
     },
     photos: [{
-        type: String // URLs to uploaded photos
+        type: String // URLs/paths to uploaded photos
     }],
     status: {
         type: String,
-        enum: ['Pending', 'Approved', 'Rejected', 'Sold'],
+        enum: ['Pending', 'Approved', 'Rejected', 'Completed'],
         default: 'Pending'
     },
     createdAt: {

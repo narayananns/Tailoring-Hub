@@ -1,0 +1,42 @@
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f4f6f8;
+
+    /* Override Global Theme for Admin Consistency */
+    --primary-color: #2c3e50;
+    --primary-dark: #1a252f;
+    --primary-light: #34495e;
+    --accent-color: #3498db;
+    
+    /* Ensure no bleeding of customer orange theme */
+    --warning-color: #f59e0b; 
+}
+
+.admin-main-content {
+    margin-left: 250px; /* Width of sidebar */
+    flex: 1;
+    padding: 2rem;
+    width: calc(100% - 250px);
+}
+
+@media (max-width: 768px) {
+    .admin-sidebar {
+        width: 60px;
+        overflow: hidden;
+    }
+    .admin-sidebar .admin-profile, .admin-sidebar .admin-nav button span:not(.badge), .admin-sidebar .admin-nav button:not(.badge) {
+        /* Hide text on small screens, keep icons - this is a simple responsive fix, ideally we'd have a toggle */
+    }
+    .admin-profile h3, .admin-profile p {
+        display: none;
+    }
+    .admin-nav button {
+        justify-content: center;
+        padding: 1rem 0.5rem;
+    }
+    .admin-main-content {
+        margin-left: 60px;
+        width: calc(100% - 60px);
+    }
+}

@@ -34,11 +34,14 @@ router.post('/create', auth, async (req, res) => {
     try {
         const { items, shippingDetails, paymentMethod, totalAmount } = req.body;
 
-        // Generate order ID
-        const orderId = 'ORD' + Date.now().toString().slice(-8);
+        // Generate IDs
+        const timestamp = Date.now().toString();
+        const orderId = 'ORD' + timestamp.slice(-8);
+        const transactionId = 'TRX' + timestamp + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
 
         const order = new Order({
             orderId,
+            transactionId,
             userId: req.user._id,
             items,
             totalAmount,
@@ -54,6 +57,7 @@ router.post('/create', auth, async (req, res) => {
             message: 'Order placed successfully',
             order: {
                 orderId: order.orderId,
+                transactionId: order.transactionId,
                 totalAmount: order.totalAmount,
                 status: order.status,
                 createdAt: order.createdAt
@@ -78,6 +82,24 @@ router.get('/my-orders', auth, async (req, res) => {
     }
 });
 
+// Get order by transaction ID
+router.get('/transaction/:transactionId', auth, async (req, res) => {
+    try {
+        const order = await Order.findOne({
+            transactionId: req.params.transactionId,
+            userId: req.user._id
+        });
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        res.json({ order });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to fetch order details' });
+    }
+});
+
 // Get single order details
 router.get('/:orderId', auth, async (req, res) => {
     try {
@@ -93,6 +115,47 @@ router.get('/:orderId', auth, async (req, res) => {
         res.json({ order });
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch order details' });
+    }
+});
+
+// Get all orders (Admin only - placeholder auth check)
+router.get('/', async (req, res) => {
+    try {
+        const orders = await Order.find().sort({ createdAt: -1 });
+        res.json({ orders, count: orders.length });
+    } catch (error) {
+        console.error('Fetch all orders error:', error);
+        res.status(500).json({ message: 'Failed to fetch orders' });
+    }
+});
+
+// Get single order for admin
+router.get('/admin/:id', async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+        res.json(order);
+    } catch (error) {
+        console.error('Fetch order details error:', error);
+        res.status(500).json({ message: 'Failed to fetch order details' });
+    }
+});
+
+// Update order status
+router.put('/:id/status', async (req, res) => {
+    try {
+        const { status } = req.body;
+        const order = await Order.findByIdAndUpdate(
+            req.params.id,
+            { status },
+            { new: true }
+        );
+        res.json(order);
+    } catch (error) {
+        console.error('Update order status error:', error);
+        res.status(500).json({ message: 'Failed to update order status' });
     }
 });
 

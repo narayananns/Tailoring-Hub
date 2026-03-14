@@ -83,6 +83,12 @@ function Sell() {
         setIsSubmitting(true)
         setError('')
 
+        if (!/^\d{10}$/.test(formData.phone)) {
+            setError('Phone number must be exactly 10 digits')
+            setIsSubmitting(false)
+            return
+        }
+
         try {
             // Create FormData for multipart/form-data submission
             const submitData = new FormData()
@@ -97,7 +103,7 @@ function Sell() {
                 submitData.append('photos', photo)
             })
 
-            const response = await fetch('http://localhost:5000/api/sell-requests', {
+            const response = await fetch('/api/sell-requests', {
                 method: 'POST',
                 body: submitData
             })

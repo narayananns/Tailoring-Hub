@@ -1,0 +1,263 @@
+.admin-order-details-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333; /* Ensure text is dark */
+}
+
+.order-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+    color: #000; /* Header text black */
+}
+
+.order-details-header h2 {
+    color: #2c3e50;
+    margin: 0;
+}
+
+.btn-back {
+    background: white;
+    color: #2c3e50;
+    border: 1px solid #2c3e50;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.btn-back:hover {
+    background: #2c3e50;
+    color: white;
+}
+
+.status-control {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: 500;
+    color: #333;
+    text-transform: capitalize;
+    border: 1px solid #ddd;
+    background: #f8f9fa;
+}
+
+.status-badge.pending { 
+    background-color: #fffbeb; 
+    color: #92400e; 
+    border: 1px solid #fcd34d; 
+}
+
+.status-badge.confirmed,
+.status-badge.completed { 
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #93c5fd; 
+}
+
+.status-badge.shipped { 
+    background-color: #f3e8ff;
+    color: #7e22ce;
+    border: 1px solid #d8b4fe;
+}
+
+.status-badge.delivered { 
+    background-color: #ecfdf5;
+    color: #047857;
+    border: 1px solid #6ee7b7;
+}
+
+.status-badge.cancelled { 
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #f87171;
+}
+
+.status-select-large {
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* --- PRINT INVOICE STYLES --- */
+.printable-invoice {
+    display: none; /* Hidden by default on screen */
+}
+
+@media print {
+    /* Hide everything else */
+    body > * {
+        visibility: hidden;
+    }
+
+    /* Reset global layout styles that might interfere */
+    .admin-layout, .admin-main-content, .admin-sidebar, .order-details-header, .btn-back, .btn-print, .status-section, .details-grid, .order-summary, .actions-section {
+        display: none !important;
+    }
+
+    /* Show and Position Invoice */
+    .printable-invoice {
+        display: block !important;
+        visibility: visible;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 40px;
+        background: white;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        color: #333;
+    }
+
+    /* Invoice Specific Styling just for Print */
+    .printable-invoice h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        color: #1a202c;
+    }
+
+    .printable-invoice h2 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: #4a5568;
+    }
+
+    .printable-invoice p {
+        margin: 4px 0;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .printable-invoice table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 2rem;
+    }
+    
+    .printable-invoice th {
+        border-bottom: 2px solid #2d3748;
+        padding: 10px;
+        text-align: left;
+    }
+    
+    .printable-invoice td {
+        border-bottom: 1px solid #e2e8f0;
+        padding: 10px;
+    }
+
+    .printable-invoice .invoice-footer h3 {
+        font-size: 1.5rem;
+        color: #2d3748;
+        border-top: 2px solid #e2e8f0;
+        padding-top: 1rem;
+        display: inline-block;
+    }
+}
+
+.detail-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.detail-section h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid #f9f9f9;
+    color: #333;
+}
+
+.info-row strong {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.info-row span {
+    color: #000;
+}
+
+.info-group {
+    color: #333;
+}
+
+.detail-section p {
+    color: #444;
+}
+
+.price-highlight {
+    color: #27ae60; 
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    color: #333;
+}
+
+.items-table th, .items-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    color: #222;
+}
+
+.items-table th {
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.admin-order-details-container .item-name {
+    font-weight: 500;
+    color: #2c3e50; /* Specific selector to override global styles */
+}
+
+.admin-order-details-container .item-brand {
+    color: #7f8c8d;
+    font-size: 0.9em;
+}
+
+/* Ensure footer sticks to bottom */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}

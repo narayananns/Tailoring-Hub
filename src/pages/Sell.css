@@ -198,6 +198,42 @@
     opacity: 1;
 }
 
+@media (max-width: 1024px) {
+    .sell-layout {
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .sell-layout {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .sell-info {
+        order: 2;
+    }
+
+    .sell-form-container {
+        padding: 2rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .sell-form-container {
+        padding: 1.5rem;
+    }
+    
+    .photo-upload-zone {
+        padding: 1.5rem;
+    }
+}
+
 .photo-upload-zone.drag-active {
     border-color: var(--primary-light);
     background: rgba(217, 119, 6, 0.08);

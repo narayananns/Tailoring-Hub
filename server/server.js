@@ -12,7 +12,12 @@ dotenv.config();
 const app = express();
 
 // MongoDB Connection
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/tmms';
+const MONGO_URI = process.env.MONGO_URI;
+
+if (!MONGO_URI) {
+    console.error('❌ MONGO_URI is missing in environment variables!');
+    process.exit(1);
+}
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log('✅ Connected to MongoDB'))
@@ -69,6 +74,8 @@ const orderRoutes = require('./routes/orders');
 const paymentRoutes = require('./routes/payment');
 const sellRoutes = require('./routes/sell');
 const serviceRoutes = require('./routes/service');
+const contactRoutes = require('./routes/contact');
+const machineRoutes = require('./routes/machines');
 
 // Use Routes
 app.use('/api/auth', authRoutes);
@@ -76,6 +83,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/sell-requests', sellRoutes);
 app.use('/api/service-bookings', serviceRoutes);
+app.use('/api/contacts', contactRoutes);
+app.use('/api/machines', machineRoutes);
 
 // Basic route
 app.get('/api', (req, res) => {
@@ -106,14 +115,6 @@ app.get('/api/spare-parts', (req, res) => {
     res.json({
         message: 'Spare parts endpoint',
         data: []
-    });
-});
-
-app.post('/api/contacts', (req, res) => {
-    console.log('Contact message received:', req.body);
-    res.json({
-        message: 'Message received successfully',
-        data: req.body
     });
 });
 

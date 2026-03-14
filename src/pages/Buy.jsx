@@ -4,6 +4,7 @@ import './Buy.css'
 
 function Buy() {
     const [activeTab, setActiveTab] = useState('machines')
+    const [searchTerm, setSearchTerm] = useState('')
     const [toast, setToast] = useState(null)
     const navigate = useNavigate()
 
@@ -202,6 +203,17 @@ function Buy() {
         navigate('/checkout')
     }
 
+    const filteredMachines = machines.filter(m => 
+        m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        m.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (m.description || '').toLowerCase().includes(searchTerm.toLowerCase())
+    )
+
+    const filteredParts = spareParts.filter(p => 
+        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (p.category || '').toLowerCase().includes(searchTerm.toLowerCase())
+    )
+
     return (
         <div className="buy-page">
             {/* Toast Notification */}
@@ -223,92 +235,118 @@ function Buy() {
                     <div className="tab-buttons">
                         <button
                             className={`tab-btn ${activeTab === 'machines' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('machines')}
+                            onClick={() => { setActiveTab('machines'); setSearchTerm(''); }}
                         >
                             🪡 Tailoring Machines
                         </button>
                         <button
                             className={`tab-btn ${activeTab === 'parts' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('parts')}
+                            onClick={() => { setActiveTab('parts'); setSearchTerm(''); }}
                         >
                             ⚙️ Spare Parts
                         </button>
                     </div>
 
+                    {/* Search Bar */}
+                    <div className="search-container">
+                        <span className="search-icon">🔍</span>
+                        <input 
+                            type="text" 
+                            className="search-input" 
+                            placeholder={`Search ${activeTab === 'machines' ? 'machines' : 'spare parts'}...`}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+
                     {/* Machines Grid */}
                     {activeTab === 'machines' && (
                         <div className="products-section">
-                            <div className="grid grid-3 products-grid">
-                                {machines.map((machine) => (
-                                    <div key={machine.id} className="product-card card">
-                                        <div className="product-image">
-                                            <img src={machine.image} alt={machine.name} />
-                                        </div>
-                                        <div className="product-content">
-                                            <div className="product-badges">
-                                                <span className={`badge ${machine.condition === 'New' ? 'badge-success' : 'badge-warning'}`}>
-                                                    {machine.condition}
-                                                </span>
-                                                <span className="badge badge-info">{machine.speed}</span>
+                            {filteredMachines.length === 0 ? (
+                                <div className="no-results" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                                    <h3>No machines found</h3>
+                                    <p>Try searching for a different term</p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-3 products-grid">
+                                    {filteredMachines.map((machine) => (
+                                        <div key={machine.id} className="product-card card">
+                                            <div className="product-image">
+                                                <img src={machine.image} alt={machine.name} />
                                             </div>
-                                            <h3 className="product-title">{machine.name}</h3>
-                                            <p className="product-brand">{machine.brand}</p>
-                                            <p className="product-description">{machine.description}</p>
-                                            <div className="product-footer">
-                                                <span className="product-price">₹{machine.price.toLocaleString()}</span>
-                                                <div className="product-actions">
-                                                    <button
-                                                        className="btn btn-secondary btn-sm"
-                                                        onClick={() => addToCart(machine)}
-                                                    >
-                                                        🛒 Add to Cart
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-primary btn-sm"
-                                                        onClick={() => buyNow(machine)}
-                                                    >
-                                                        ⚡ Buy Now
-                                                    </button>
+                                            <div className="product-content">
+                                                <div className="product-badges">
+                                                    <span className={`badge ${machine.condition === 'New' ? 'badge-success' : 'badge-warning'}`}>
+                                                        {machine.condition}
+                                                    </span>
+                                                    <span className="badge badge-info">{machine.speed}</span>
+                                                </div>
+                                                <h3 className="product-title">{machine.name}</h3>
+                                                <p className="product-brand">{machine.brand}</p>
+                                                <p className="product-description">{machine.description}</p>
+                                                <div className="product-footer">
+                                                    <span className="product-price">₹{machine.price.toLocaleString()}</span>
+                                                    <div className="product-actions">
+                                                        <button
+                                                            className="btn btn-secondary btn-sm"
+                                                            onClick={() => addToCart(machine)}
+                                                        >
+                                                            🛒 Add to Cart
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-primary btn-sm"
+                                                            onClick={() => buyNow(machine)}
+                                                        >
+                                                            ⚡ Buy Now
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
 
                     {/* Spare Parts Grid */}
                     {activeTab === 'parts' && (
                         <div className="products-section">
-                            <div className="grid grid-3 products-grid">
-                                {spareParts.map((part) => (
-                                    <div key={part.id} className="product-card card spare-part-card">
-                                        <div className="product-image small">{part.image}</div>
-                                        <div className="product-content">
-                                            <span className="badge badge-primary">{part.category}</span>
-                                            <h3 className="product-title">{part.name}</h3>
-                                            <div className="product-footer">
-                                                <span className="product-price">₹{part.price.toLocaleString()}</span>
-                                                <div className="product-actions">
-                                                    <button
-                                                        className="btn btn-secondary btn-sm"
-                                                        onClick={() => addToCart(part)}
-                                                    >
-                                                        🛒 Add
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-primary btn-sm"
-                                                        onClick={() => buyNow(part)}
-                                                    >
-                                                        ⚡ Buy
-                                                    </button>
+                            {filteredParts.length === 0 ? (
+                                <div className="no-results" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                                    <h3>No parts found</h3>
+                                    <p>Try searching for a different term</p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-3 products-grid">
+                                    {filteredParts.map((part) => (
+                                        <div key={part.id} className="product-card card spare-part-card">
+                                            <div className="product-image small">{part.image}</div>
+                                            <div className="product-content">
+                                                <span className="badge badge-primary">{part.category}</span>
+                                                <h3 className="product-title">{part.name}</h3>
+                                                <div className="product-footer">
+                                                    <span className="product-price">₹{part.price.toLocaleString()}</span>
+                                                    <div className="product-actions">
+                                                        <button
+                                                            className="btn btn-secondary btn-sm"
+                                                            onClick={() => addToCart(part)}
+                                                        >
+                                                            🛒 Add
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-primary btn-sm"
+                                                            onClick={() => buyNow(part)}
+                                                        >
+                                                            ⚡ Buy
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

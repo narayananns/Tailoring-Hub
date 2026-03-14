@@ -17,6 +17,8 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import AdminLogin from './pages/AdminLogin'
 import AdminSignup from './pages/AdminSignup'
+import AdminDashboard from './pages/AdminDashboard'
+import AdminOrderDetails from './pages/AdminOrderDetails'
 import Profile from './pages/Profile'
 import MyOrders from './pages/MyOrders'
 import Cart from './pages/Cart'
@@ -25,6 +27,9 @@ import './App.css'
 
 function App() {
   const location = useLocation()
+  
+  // Check if current route should use Admin Layout (no public Navbar/Footer)
+  const isAdminLayout = location.pathname.startsWith('/admin/dashboard') || location.pathname.startsWith('/admin/orders');
 
   return (
     <div className="app">
@@ -34,8 +39,8 @@ function App() {
           color: '#fff',
         },
       }} />
-      <Navbar />
-      <main className="main-content">
+      {!isAdminLayout && <Navbar />}
+      <main className={isAdminLayout ? "" : "main-content"}>
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<PageTransition><Home /></PageTransition>} />
@@ -55,6 +60,8 @@ function App() {
             {/* Admin Auth Routes */}
             <Route path="/admin/login" element={<PageTransition><AdminLogin /></PageTransition>} />
             <Route path="/admin/signup" element={<PageTransition><AdminSignup /></PageTransition>} />
+            <Route path="/admin/dashboard" element={<PageTransition><AdminDashboard /></PageTransition>} />
+            <Route path="/admin/orders/:id" element={<PageTransition><AdminOrderDetails /></PageTransition>} />
 
             {/* Profile Route */}
             <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
@@ -68,7 +75,7 @@ function App() {
           </Routes>
         </AnimatePresence>
       </main>
-      <Footer />
+      {!isAdminLayout && !location.pathname.startsWith('/admin/login') && !location.pathname.startsWith('/admin/signup') && <Footer />}
     </div>
   )
 }

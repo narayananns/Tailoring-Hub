@@ -10,12 +10,16 @@ const razorpay = new Razorpay({
     key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
-const JWT_SECRET = process.env.JWT_SECRET || 'tmms-secret-key-2024';
+const JWT_SECRET = process.env.JWT_SECRET;
 const User = require('../models/User');
 
 // Middleware to verify JWT token (matching orders.js pattern)
 const verifyToken = async (req, res, next) => {
     try {
+        if (!JWT_SECRET) {
+            console.error('JWT_SECRET not found in environment');
+            return res.status(500).json({ message: 'Server configuration error' });
+        }
         const token = req.header('Authorization')?.replace('Bearer ', '');
         if (!token) {
             console.log('Payment Auth: No token provided');

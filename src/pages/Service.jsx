@@ -33,8 +33,14 @@ function Service() {
         setIsSubmitting(true)
         setError('')
 
+        if (!/^\d{10}$/.test(formData.phone)) {
+            setError('Phone number must be exactly 10 digits')
+            setIsSubmitting(false)
+            return
+        }
+
         try {
-            const response = await fetch('http://localhost:5000/api/service-bookings', {
+            const response = await fetch('/api/service-bookings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -34,6 +34,12 @@ function AdminSignup() {
             return
         }
 
+        if (!/^\d{10}$/.test(formData.phone)) {
+            setError('Phone number must be exactly 10 digits')
+            setIsLoading(false)
+            return
+        }
+
         if (formData.password.length < 6) {
             setError('Password must be at least 6 characters')
             setIsLoading(false)
@@ -41,7 +47,7 @@ function AdminSignup() {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/auth/admin/register', {
+            const response = await fetch('/api/auth/admin/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

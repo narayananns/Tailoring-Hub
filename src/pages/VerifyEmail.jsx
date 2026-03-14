@@ -47,7 +47,7 @@ function VerifyEmail() {
         setMessage('')
 
         try {
-            const response = await fetch('http://localhost:5000/api/auth/verify-email', {
+            const response = await fetch('/api/auth/verify-email', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -88,7 +88,7 @@ function VerifyEmail() {
         setMessage('')
         
         try {
-            const response = await fetch('http://localhost:5000/api/auth/resend-otp', {
+            const response = await fetch('/api/auth/resend-otp', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

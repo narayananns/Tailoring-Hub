@@ -50,11 +50,11 @@ const serviceBookingSchema = new mongoose.Schema({
     },
     preferredTime: {
         type: String,
-        required: [true, 'Preferred time is required']
+        required: false
     },
     status: {
         type: String,
-        enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
+        enum: ['Pending', 'Confirmed', 'In Progress', 'Completed', 'Cancelled'],
         default: 'Pending'
     },
     createdAt: {

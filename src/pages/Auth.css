@@ -18,11 +18,11 @@
     pointer-events: none;
 }
 
-/* Admin Page Variant */
+/* Admin Page Variant - Professional Blue Theme */
 .admin-auth::before {
     background:
-        radial-gradient(at 30% 30%, rgba(13, 148, 136, 0.15) 0px, transparent 50%),
-        radial-gradient(at 70% 70%, rgba(217, 119, 6, 0.1) 0px, transparent 50%);
+        radial-gradient(at 30% 30%, rgba(59, 130, 246, 0.15) 0px, transparent 50%), /* Blue */
+        radial-gradient(at 70% 70%, rgba(30, 41, 59, 0.1) 0px, transparent 50%); /* Dark Slate */
 }
 
 /* Auth Container */
@@ -50,7 +50,7 @@
 }
 
 .admin-auth .auth-container::before {
-    background: linear-gradient(90deg, transparent, #14b8a6, transparent);
+    background: linear-gradient(90deg, transparent, #3b82f6, transparent); /* Blue border highlight */
 }
 
 /* Auth Header */
@@ -75,8 +75,8 @@
 }
 
 .admin-icon {
-    border-color: rgba(13, 148, 136, 0.4);
-    box-shadow: 0 0 30px rgba(13, 148, 136, 0.2);
+    border-color: rgba(59, 130, 246, 0.4); /* Blue */
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
 }
 
 .auth-header h1 {

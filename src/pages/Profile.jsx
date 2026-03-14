@@ -24,7 +24,7 @@ function Profile() {
             }
 
             try {
-                const response = await fetch('http://localhost:5000/api/auth/verify', {
+                const response = await fetch('/api/auth/verify', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -76,7 +76,7 @@ function Profile() {
 
         try {
             const token = localStorage.getItem('token')
-            const res = await fetch('http://localhost:5000/api/auth/profile/photo', {
+            const res = await fetch('/api/auth/profile/photo', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -123,11 +123,16 @@ function Profile() {
             return
         }
 
+        if (formData.phone && !/^\d{10}$/.test(formData.phone)) {
+            toast.error('Phone number must be exactly 10 digits')
+            return
+        }
+
         const loadingToast = toast.loading('Updating profile...')
 
         try {
             const token = localStorage.getItem('token')
-            const res = await fetch('http://localhost:5000/api/auth/profile/update', {
+            const res = await fetch('/api/auth/profile/update', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -177,7 +182,7 @@ function Profile() {
                         <div className="profile-avatar-large">
                             {user.profilePhoto ? (
                                 <img
-                                    src={`http://localhost:5000${user.profilePhoto}`}
+                                    src={user.profilePhoto}
                                     alt="Profile"
                                     className="profile-img"
                                     onError={(e) => {
@@ -301,8 +306,8 @@ function Profile() {
                             </>
                         ) : (
                             <>
-                                <button className="btn btn-secondary" onClick={() => navigate('/')}>
-                                    ← Back to Home
+                                <button className="btn btn-secondary" onClick={() => navigate(user.role === 'admin' ? '/admin/dashboard' : '/')}>
+                                    ← {user.role === 'admin' ? 'Back to Dashboard' : 'Back to Home'}
                                 </button>
                                 <button className="btn btn-danger" onClick={handleLogout}>
                                     🚪 Logout

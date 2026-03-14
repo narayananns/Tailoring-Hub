@@ -203,6 +203,51 @@
     filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.3));
 }
 
+@media (max-width: 1024px) {
+    .booking-container {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-info {
+        padding: 3rem;
+    }
+
+    .booking-form {
+        padding: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .services-grid {
+        gap: 1.5rem;
+    }
+
+    .booking-info, 
+    .booking-form {
+        padding: 2rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .date-time-picker {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .booking-info, 
+    .booking-form {
+        padding: 1.5rem;
+    }
+
+    .service-card {
+        padding: 2rem 1.5rem;
+    }
+}
+
 .success-card h2 {
     font-size: 2rem;
     font-weight: 800;

@@ -3,24 +3,29 @@ import './About.css'
 function About() {
     const timeline = [
         {
-            year: '2020',
+            year: '1997',
             title: 'Company Founded',
             description: 'Started with a vision to revolutionize the tailoring machine industry.'
         },
         {
-            year: '2021',
+            year: '1998',
             title: 'First 100 Customers',
             description: 'Reached our first milestone of serving 100 happy customers.'
         },
         {
-            year: '2022',
+            year: '2001',
             title: 'Service Center Launch',
             description: 'Opened our first dedicated service and repair center.'
         },
         {
-            year: '2023',
+            year: '2003',
             title: 'Spare Parts Division',
             description: 'Launched our genuine spare parts distribution network.'
+        },
+        {
+            year: '2026',
+            title: 'Online Store',
+            description: 'Introduced our online platform for easier access to products and services.'
         }
     ]
 
@@ -56,7 +61,7 @@ function About() {
                                     <span className="stat-text">Happy Customers</span>
                                 </div>
                                 <div className="mission-stat">
-                                    <span className="stat-value">3+</span>
+                                    <span className="stat-value">29+</span>
                                     <span className="stat-text">Years Experience</span>
                                 </div>
                             </div>

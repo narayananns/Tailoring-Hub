@@ -84,4 +84,28 @@ router.get('/', async (req, res) => {
     }
 });
 
+// @route   PUT /api/sell-requests/:id/status
+// @desc    Update sell request status
+// @access  Private (Admin)
+router.put('/:id/status', async (req, res) => {
+    try {
+        const { status } = req.body;
+        
+        const request = await SellRequest.findByIdAndUpdate(
+            req.params.id,
+            { status },
+            { new: true, runValidators: true }
+        );
+
+        if (!request) {
+            return res.status(404).json({ message: 'Sell request not found' });
+        }
+
+        res.json(request);
+    } catch (error) {
+        console.error('Error updating status:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
 module.exports = router;

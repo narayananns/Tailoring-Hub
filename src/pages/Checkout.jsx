@@ -101,7 +101,7 @@ function Checkout() {
         setIsLoading(true)
 
         try {
-            const response = await fetch('http://localhost:5000/api/orders/create', {
+            const response = await fetch('/api/orders/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ function Checkout() {
 
         try {
             // Step 1: Create Razorpay order
-            const orderResponse = await fetch('http://localhost:5000/api/payment/create-order', {
+            const orderResponse = await fetch('/api/payment/create-order', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -231,7 +231,7 @@ function Checkout() {
 
         try {
             // Step 1: Verify payment signature
-            const verifyResponse = await fetch('http://localhost:5000/api/payment/verify', {
+            const verifyResponse = await fetch('/api/payment/verify', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -250,7 +250,7 @@ function Checkout() {
             }
 
             // Step 2: Create order with payment details
-            const orderResponse = await fetch('http://localhost:5000/api/orders/create', {
+            const orderResponse = await fetch('/api/orders/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

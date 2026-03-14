@@ -32,6 +32,10 @@ const orderSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    transactionId: {
+        type: String,
+        unique: true
+    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

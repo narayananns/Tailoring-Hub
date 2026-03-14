@@ -49,6 +49,12 @@ function CustomerSignup() {
             return
         }
 
+        if (!/^\d{10}$/.test(formData.phone)) {
+            setError('Phone number must be exactly 10 digits')
+            setIsLoading(false)
+            return
+        }
+
         if (formData.password.length < 6) {
             setError('Password must be at least 6 characters')
             setIsLoading(false)
@@ -56,7 +62,7 @@ function CustomerSignup() {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/auth/customer/register', {
+            const response = await fetch('/api/auth/customer/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -91,7 +97,7 @@ function CustomerSignup() {
         setError('')
 
         try {
-            const response = await fetch('http://localhost:5000/api/auth/verify-email', {
+            const response = await fetch('/api/auth/verify-email', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -126,7 +132,7 @@ function CustomerSignup() {
 
         setIsLoading(true)
         try {
-            const response = await fetch('http://localhost:5000/api/auth/resend-otp', {
+            const response = await fetch('/api/auth/resend-otp', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
