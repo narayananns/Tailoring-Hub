@@ -78,6 +78,10 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
         default: 'pending'
+    },
+    cancellationReason: {
+        type: String,
+        default: ''
     }
 }, {
     timestamps: true

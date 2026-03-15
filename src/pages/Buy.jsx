@@ -1,10 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import QuickViewModal from '../components/QuickViewModal'
 import './Buy.css'
 
 function Buy() {
     const [activeTab, setActiveTab] = useState('machines')
+    const [selectedProduct, setSelectedProduct] = useState(null)
+    const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
+    const [filterCondition, setFilterCondition] = useState('All')
+    const [sortBy, setSortBy] = useState('relevant') // relevant, priceHighLow, priceLowHigh
     const [toast, setToast] = useState(null)
     const navigate = useNavigate()
 
@@ -203,16 +208,27 @@ function Buy() {
         navigate('/checkout')
     }
 
-    const filteredMachines = machines.filter(m => 
-        m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        m.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (m.description || '').toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    const filteredMachines = machines.filter(m => {
+        const matchesCondition = filterCondition === 'All' || m.condition === filterCondition;
+        const matchesSearch = m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            m.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (m.description || '').toLowerCase().includes(searchTerm.toLowerCase());
+        
+        return matchesCondition && matchesSearch;
+    }).sort((a, b) => {
+        if (sortBy === 'priceHighLow') return b.price - a.price;
+        if (sortBy === 'priceLowHigh') return a.price - b.price;
+        return 0; // Default order
+    })
 
     const filteredParts = spareParts.filter(p => 
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (p.category || '').toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    ).sort((a, b) => {
+        if (sortBy === 'priceHighLow') return b.price - a.price;
+        if (sortBy === 'priceLowHigh') return a.price - b.price;
+        return 0; // Default order
+    })
 
     return (
         <div className="buy-page">
@@ -235,7 +251,7 @@ function Buy() {
                     <div className="tab-buttons">
                         <button
                             className={`tab-btn ${activeTab === 'machines' ? 'active' : ''}`}
-                            onClick={() => { setActiveTab('machines'); setSearchTerm(''); }}
+                            onClick={() => { setActiveTab('machines'); setFilterCondition('All'); setSearchTerm(''); }}
                         >
                             🪡 Tailoring Machines
                         </button>
@@ -247,16 +263,60 @@ function Buy() {
                         </button>
                     </div>
 
-                    {/* Search Bar */}
-                    <div className="search-container">
-                        <span className="search-icon">🔍</span>
-                        <input 
-                            type="text" 
-                            className="search-input" 
-                            placeholder={`Search ${activeTab === 'machines' ? 'machines' : 'spare parts'}...`}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+                    {/* Filter Buttons (Only for Machines) */}
+                    {activeTab === 'machines' && (
+                        <div className="filter-buttons">
+                            <button 
+                                className={`filter-btn ${filterCondition === 'All' ? 'active' : ''}`}
+                                onClick={() => setFilterCondition('All')}
+                            >
+                                All
+                            </button>
+                            <button 
+                                className={`filter-btn ${filterCondition === 'New' ? 'active' : ''}`}
+                                onClick={() => setFilterCondition('New')}
+                            >
+                                🌟 New
+                            </button>
+                            <button 
+                                className={`filter-btn ${filterCondition === 'Refurbished' ? 'active' : ''}`}
+                                onClick={() => setFilterCondition('Refurbished')}
+                            >
+                                ♻️ Refurbished
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Search and Sort Section */}
+                    <div className="search-container" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        <div style={{ position: 'relative', flex: 1 }}>
+                            <span className="search-icon">🔍</span>
+                            <input 
+                                type="text" 
+                                className="search-input" 
+                                placeholder={`Search ${activeTab === 'machines' ? 'machines' : 'spare parts'}...`}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <select 
+                            value={sortBy} 
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className="sort-select"
+                            style={{
+                                padding: '0.8rem 1rem',
+                                borderRadius: '8px',
+                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                background: 'var(--bg-secondary)',
+                                color: 'var(--text-primary)',
+                                cursor: 'pointer',
+                                outline: 'none'
+                            }}
+                        >
+                            <option value="relevant">Relevant</option>
+                            <option value="priceLowHigh">Price: Low to High</option>
+                            <option value="priceHighLow">Price: High to Low</option>
+                        </select>
                     </div>
 
                     {/* Machines Grid */}
@@ -286,18 +346,33 @@ function Buy() {
                                                 <p className="product-description">{machine.description}</p>
                                                 <div className="product-footer">
                                                     <span className="product-price">₹{machine.price.toLocaleString()}</span>
-                                                    <div className="product-actions">
-                                                        <button
-                                                            className="btn btn-secondary btn-sm"
-                                                            onClick={() => addToCart(machine)}
+                                                    <div className="product-actions" style={{ flexDirection: 'column', gap: '8px' }}>
+                                                        <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                                                            <button
+                                                                className="btn btn-secondary btn-sm"
+                                                                style={{ flex: 1 }}
+                                                                onClick={() => addToCart(machine)}
+                                                            >
+                                                                🛒 Add
+                                                            </button>
+                                                            <button
+                                                                className="btn btn-primary btn-sm"
+                                                                style={{ flex: 1 }}
+                                                                onClick={() => buyNow(machine)}
+                                                            >
+                                                                ⚡ Buy
+                                                            </button>
+                                                        </div>
+                                                        <button 
+                                                            className="btn btn-outline btn-sm"
+                                                            style={{ width: '100%', border: '1px solid #cbd5e1' }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setSelectedProduct(machine);
+                                                                setIsQuickViewOpen(true);
+                                                            }}
                                                         >
-                                                            🛒 Add to Cart
-                                                        </button>
-                                                        <button
-                                                            className="btn btn-primary btn-sm"
-                                                            onClick={() => buyNow(machine)}
-                                                        >
-                                                            ⚡ Buy Now
+                                                            👁️ Quick View
                                                         </button>
                                                     </div>
                                                 </div>
@@ -351,6 +426,14 @@ function Buy() {
                     )}
                 </div>
             </section>
+
+            {/* Quick View Modal */}
+            <QuickViewModal 
+                product={selectedProduct} 
+                isOpen={isQuickViewOpen} 
+                onClose={() => setIsQuickViewOpen(false)} 
+                onAddToCart={addToCart}
+            />
         </div>
     )
 }

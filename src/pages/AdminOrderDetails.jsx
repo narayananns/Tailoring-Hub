@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import Skeleton from 'react-loading-skeleton'
 import './AdminOrderDetails.css'
 import './AdminOrderDetailsResponsive.css'
 import AdminLayout from '../components/AdminLayout'
@@ -53,7 +54,38 @@ const AdminOrderDetails = () => {
         window.print();
     };
 
-    if (loading) return <div className="loading">Loading...</div>
+    if (loading) {
+        return (
+            <AdminLayout activeTab="orders">
+                <div className="admin-order-details-container">
+                    <div className="order-details-header" style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between' }}>
+                        <Skeleton width={150} height={36} />
+                        <Skeleton width={120} height={36} />
+                    </div>
+                    <div className="order-content-section" style={{ background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '2rem' }}>
+                            <div>
+                                <Skeleton height={30} width={200} style={{ marginBottom: '1rem' }} />
+                                <Skeleton count={3} width={300} style={{ marginBottom: '0.5rem' }} />
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                                <Skeleton height={30} width={150} style={{ marginBottom: '1rem', marginLeft: 'auto' }} />
+                                <Skeleton count={2} width={200} style={{ marginLeft: 'auto', marginBottom: '0.5rem' }} />
+                            </div>
+                        </div>
+                        <div style={{ marginBottom: '2rem' }}>
+                            <Skeleton height={40} style={{ marginBottom: '1rem' }} />
+                            <Skeleton count={3} height={60} style={{ marginBottom: '0.5rem' }} />
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
+                            <Skeleton height={50} width={250} />
+                        </div>
+                    </div>
+                </div>
+            </AdminLayout>
+        )
+    }
+    
     if (!order) return <div className="error">Order not found</div>
 
     return (

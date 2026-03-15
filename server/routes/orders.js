@@ -2,10 +2,11 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const Order = require('../models/Order');
 const User = require('../models/User');
+const { sendOrderStatusUpdate } = require('../utils/emailService');
 
 const router = express.Router();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'tmms-secret-key-2024';
+const JWT_SECRET = process.env.JWT_SECRET || 'tmms-dev-secret';
 
 // Authentication middleware
 const auth = async (req, res, next) => {
@@ -146,12 +147,28 @@ router.get('/admin/:id', async (req, res) => {
 // Update order status
 router.put('/:id/status', async (req, res) => {
     try {
-        const { status } = req.body;
+        const { status, cancellationReason } = req.body;
+        const updateData = { status };
+        if (status === 'cancelled' && cancellationReason) {
+            updateData.cancellationReason = cancellationReason;
+        }
+
         const order = await Order.findByIdAndUpdate(
             req.params.id,
-            { status },
+            updateData,
             { new: true }
         );
+
+        if (order && order.shippingDetails && order.shippingDetails.email) {
+            // Send email notification asynchronously
+            sendOrderStatusUpdate(
+                order.shippingDetails.email, 
+                order.orderId || order._id, 
+                status, 
+                status === 'cancelled' ? cancellationReason : ''
+            ).catch(err => console.error('Failed to send status email:', err));
+        }
+
         res.json(order);
     } catch (error) {
         console.error('Update order status error:', error);

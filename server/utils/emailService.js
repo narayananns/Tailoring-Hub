@@ -105,7 +105,64 @@ const sendWelcomeEmail = async (email, name) => {
     return sendEmail(email, 'Welcome to TMMS! 🧵', getEmailTemplate(content, title));
 };
 
+const sendOrderStatusUpdate = async (email, orderId, status, additionalInfo = '') => {
+    const title = `Order Status Update #${orderId}`;
+    const statusColor = status === 'shipped' ? '#3b82f6' : status === 'delivered' ? '#22c55e' : status === 'cancelled' ? '#ef4444' : '#f59e0b';
+    
+    // Customize message based on status
+    let message = '';
+    let emoji = '';
+    switch(status) {
+        case 'confirmed':
+            message = 'Great news! Your order has been confirmed and is being processed.';
+            emoji = '✅';
+            break;
+        case 'shipped':
+            message = 'Your order is on its way! It has been shipped from our warehouse.';
+            emoji = '🚚';
+            break;
+        case 'delivered':
+            message = 'Your order has been delivered! We hope you enjoy your purchase.';
+            emoji = '📦';
+            break;
+        case 'cancelled':
+            message = `Your order has been cancelled. ${additionalInfo ? `Reason: ${additionalInfo}` : ''}`;
+            emoji = '❌';
+            break;
+        default:
+            message = `Your order status has been updated to: ${status}`;
+            emoji = 'ℹ️';
+    }
+
+    const content = `
+        <h2 style="color: #2c3e50; margin-top: 0;">Order Status Update ${emoji}</h2>
+        <p>Your order <strong>#${orderId}</strong> status has changed.</p>
+        
+        <div style="text-align: center; padding: 25px; background-color: #f8fafc; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0;">
+            <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 8px;">New Status</div>
+            <div style="font-size: 28px; font-weight: 800; color: ${statusColor}; text-transform: capitalize; margin-bottom: 15px;">
+                ${status}
+            </div>
+            <div style="height: 1px; background: #e2e8f0; width: 50%; margin: 15px auto;"></div>
+            <p style="color: #334155; font-size: 16px; margin: 0;">${message}</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="http://localhost:5173/my-orders" style="display: inline-block; padding: 12px 24px; background-color: #4f46e5; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);">
+                View Order Details
+            </a>
+        </div>
+        
+        <p style="text-align: center; color: #94a3b8; font-size: 13px; margin-top: 20px;">
+            If you have any questions, please reply to this email.
+        </p>
+    `;
+
+    return sendEmail(email, `Order #${orderId} is ${status.charAt(0).toUpperCase() + status.slice(1)} ${emoji}`, getEmailTemplate(content, title));
+};
+
 module.exports = {
     sendOTP,
-    sendWelcomeEmail
+    sendWelcomeEmail,
+    sendOrderStatusUpdate
 };

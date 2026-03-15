@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast'
 import axios from 'axios'
 import './AdminDashboard.css'
 import './AdminDashboardTable.css' // Import table styles
-import Spinner from '../components/Spinner'
+import Skeleton from 'react-loading-skeleton'
 import AdminLayout from '../components/AdminLayout'
 import { 
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, 
@@ -13,6 +13,21 @@ import {
 import { format, subDays, isSameDay, parseISO, startOfWeek, startOfMonth, isAfter, subHours, eachDayOfInterval } from 'date-fns';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+
+const HighlightText = ({ text = '', highlight = '' }) => {
+    if (!highlight.trim()) {
+      return <span>{text}</span>
+    }
+    const regex = new RegExp(`(${highlight})`, 'gi')
+    const parts = (text || '').toString().split(regex)
+    return (
+      <span>
+        {parts.map((part, i) => 
+          regex.test(part) ? <span key={i} style={{ backgroundColor: '#fde047', fontWeight: 'bold' }}>{part}</span> : part
+        )}
+      </span>
+    )
+}
 
 const SearchBar = ({ placeholder, searchTerm, onSearchChange }) => (
     <div className="search-container">
@@ -323,6 +338,49 @@ function AdminDashboard() {
         document.body.removeChild(link);
     };
 
+    const downloadSellRequestsCSV = () => {
+        const headers = ['Request ID,User Name,Phone,Email,Machine,Model,Year,Condition,Expected Price,Status,Date'];
+        const rows = sellRequests.map(req => {
+            const date = new Date(req.createdAt).toLocaleDateString();
+            const name = (req.name || 'Guest').replace(/,/g, '');
+            const machine = (req.brand || '').replace(/,/g, '');
+            const model = (req.model || '').replace(/,/g, '');
+            const condition = (req.condition || '').replace(/,/g, '');
+            return `${req._id},${name},${req.phone},${req.email},${machine},${model},${req.yearOfPurchase},${condition},${req.expectedPrice},${req.status},${date}`;
+        });
+        
+        const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `sell_requests_export_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const downloadServiceBookingsCSV = () => {
+        const headers = ['Booking ID,Customer Name,Phone,Email,Machine Brand,Issue Description,Preferred Date,Address,Status,Created At'];
+        const rows = serviceBookings.map(s => {
+            const date = new Date(s.createdAt).toLocaleDateString();
+            const preferredDate = new Date(s.preferredDate).toLocaleDateString();
+            const name = (s.name || 'Guest').replace(/,/g, '');
+            const brand = (s.brand || '').replace(/,/g, '');
+            const issue = (s.issue || '').replace(/,/g, ' ');
+            const address = (s.address || '').replace(/,/g, ' ');
+            return `${s._id},${name},${s.phone},${s.email},${brand},${issue},${preferredDate},${address},${s.status},${date}`;
+        });
+        
+        const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `service_bookings_export_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     // --- MACHINE HANDLERS ---
     const handleMachineSubmit = async (e) => {
         e.preventDefault()
@@ -367,12 +425,23 @@ function AdminDashboard() {
 
     // --- STATUS UPDATES ---
     const updateSellStatus = async (id, status) => {
+        let rejectionReason = '';
+
+        if (status === 'Rejected') {
+            rejectionReason = window.prompt("Enter the reason for rejection (optional):");
+            if (rejectionReason === null) {
+                // User cancelled the prompt, so cancel the status update
+                return;
+            }
+        }
+
         try {
-            await axios.put(`/api/sell-requests/${id}/status`, { status })
+            await axios.put(`/api/sell-requests/${id}/status`, { status, rejectionReason })
             toast.success(`Request ${status}`)
             fetchAllData(true)
         } catch (error) {
             toast.error('Update failed')
+            console.error(error);
         }
     }
 
@@ -409,8 +478,14 @@ function AdminDashboard() {
 
     // --- ORDER HANDLERS ---
     const updateOrderStatus = async (id, status) => {
+        let cancellationReason = '';
+        if (status === 'cancelled') {
+             cancellationReason = window.prompt("Reason for cancellation (Optional):");
+             if (cancellationReason === null) return; // Cancel update
+        }
+
         try {
-            await axios.put(`/api/orders/${id}/status`, { status })
+            await axios.put(`/api/orders/${id}/status`, { status, cancellationReason })
             toast.success('Order status updated')
             fetchAllData(true)
         } catch (error) {
@@ -508,7 +583,67 @@ function AdminDashboard() {
         return Object.values(uniqueCustomers).sort((a, b) => b.totalSpent - a.totalSpent);
     }, [orders]);
 
-    if (loading) return <div className="page-loading"><Spinner /></div>
+    if (loading) {
+        return (
+            <AdminLayout activeTab={activeTab} stats={{}}>
+                <div className="admin-dashboard-container">
+                    {activeTab === 'overview' ? (
+                        <div className="overview-tab">
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                                <Skeleton width={200} height={32} />
+                                <Skeleton width={150} height={32} />
+                            </div>
+                            <div className="stats-grid">
+                                {[1, 2, 3, 4].map(i => (
+                                    <div key={i} className="stat-card" style={{ height: '120px', display: 'block' }}>
+                                        <Skeleton count={2} height={20} style={{ marginBottom: '10px' }} />
+                                        <Skeleton height={40} width="60%" />
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="charts-section" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem', marginTop: '2rem' }}>
+                                <div style={{ height: '400px', backgroundColor: 'white', borderRadius: '12px', padding: '1.5rem' }}>
+                                    <Skeleton height={30} width={200} style={{ marginBottom: '1rem' }} />
+                                    <Skeleton height={300} />
+                                </div>
+                                <div style={{ height: '400px', backgroundColor: 'white', borderRadius: '12px', padding: '1.5rem' }}>
+                                    <Skeleton height={30} width={200} style={{ marginBottom: '1rem' }} />
+                                    <Skeleton circle height={200} width={200} style={{ margin: '0 auto', display: 'block' }} />
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="admin-table-container">
+                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                                <Skeleton width={200} height={32} />
+                                <Skeleton width={300} height={32} />
+                            </div>
+                            <div className="table-wrapper" style={{ background: 'white', padding: '1rem', borderRadius: '8px' }}>
+                                <table className="data-table" style={{ width: '100%' }}>
+                                    <thead>
+                                        <tr>
+                                            {[1, 2, 3, 4, 5].map(i => (
+                                                <th key={i} style={{ padding: '10px' }}><Skeleton height={20} /></th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {[1, 2, 3, 4, 5, 6, 7, 8].map(row => (
+                                            <tr key={row}>
+                                                {[1, 2, 3, 4, 5].map(col => (
+                                                    <td key={col} style={{ padding: '10px' }}><Skeleton height={20} /></td>
+                                                ))}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </AdminLayout>
+        )
+    }
 
     // Apply filters
     const filteredMachines = machines.filter(m => {
@@ -870,7 +1005,7 @@ function AdminDashboard() {
                                                 '🔹'
                                             }
                                         </td>
-                                        <td>{machine.name}</td>
+                                        <td><HighlightText text={machine.name} highlight={searchTerm} /></td>
                                         <td>₹{machine.price}</td>
                                         <td>{machine.stock}</td>
                                         <td><span className={`status-badge ${machine.status.toLowerCase().replace(/ /g, '-')}`}>{machine.status}</span></td>
@@ -966,9 +1101,6 @@ function AdminDashboard() {
                             </thead>
                             <tbody>
                                 {filteredOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(order => {
-                                    const totalQty = order.items.reduce((acc, item) => acc + (item.quantity || 1), 0);
-                                    const isBulk = totalQty > 20;
-                                    
                                     return (
                                         <tr key={order._id} style={selectedOrders.includes(order._id) ? { background: '#f0f9ff' } : {}}>
                                             <td>
@@ -976,15 +1108,13 @@ function AdminDashboard() {
                                                     type="checkbox" 
                                                     checked={selectedOrders.includes(order._id)} 
                                                     onChange={() => toggleOrderSelection(order._id)}
-                                                    disabled={!isBulk}
-                                                    title={!isBulk ? "Bulk actions available for orders > 20 items" : ""}
-                                                    style={!isBulk ? { cursor: 'not-allowed', opacity: 0.5 } : { cursor: 'pointer' }}
+                                                    style={{ cursor: 'pointer' }}
                                                 />
                                             </td>
-                                            <td>{order.orderId}</td>
+                                            <td><HighlightText text={order.orderId} highlight={searchTerm} /></td>
                                             <td>
-                                                <strong>{order.shippingDetails?.name}</strong><br/>
-                                                <small>{order.shippingDetails?.phone}</small>
+                                                <strong><HighlightText text={order.shippingDetails?.name} highlight={searchTerm} /></strong><br/>
+                                                <small><HighlightText text={order.shippingDetails?.phone} highlight={searchTerm} /></small>
                                             </td>
                                             <td>
                                                 {order.items.map(i => (
@@ -1060,7 +1190,12 @@ function AdminDashboard() {
                 {/* SELL REQUESTS TAB */}
                 {activeTab === 'sell-requests' && (
                     <div className="sell-requests-tab">
-                        <h2>Sell Requests</h2>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h2 style={{ margin: 0 }}>Sell Requests</h2>
+                            <button onClick={downloadSellRequestsCSV} className="btn-sm btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', padding: '0.5rem 1rem' }}>
+                                📥 Export CSV
+                            </button>
+                        </div>
                         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                             <SearchBar 
                                 placeholder="Search by name, phone, model or status..." 
@@ -1096,11 +1231,11 @@ function AdminDashboard() {
                                 {filteredSellRequests.map(req => (
                                     <tr key={req._id}>
                                         <td>
-                                            <div>{req.name}</div>
-                                            <small>{req.phone}</small>
+                                            <div><HighlightText text={req.name} highlight={searchTerm} /></div>
+                                            <small><HighlightText text={req.phone} highlight={searchTerm} /></small>
                                         </td>
                                         <td>
-                                            <div>{req.brand} {req.model}</div>
+                                            <div><HighlightText text={req.brand} highlight={searchTerm} /> <HighlightText text={req.model} highlight={searchTerm} /></div>
                                             <small>{req.condition}</small>
                                         </td>
                                         <td>₹{req.expectedPrice}</td>
@@ -1109,21 +1244,16 @@ function AdminDashboard() {
                                             <button className="btn-sm btn-info" onClick={() => setViewData({ type: 'sell', data: req })}>View Details</button>
                                         </td>
                                         <td>
-                                            {(!req.status || req.status === 'Pending') && (
-                                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                                    <button className="btn-sm btn-success" onClick={() => updateSellStatus(req._id, 'Approved')}>Approve</button>
-                                                    <button className="btn-sm btn-danger" onClick={() => updateSellStatus(req._id, 'Rejected')}>Reject</button>
-                                                </div>
-                                            )}
-                                            {req.status === 'Approved' && (
-                                                <button className="btn-sm btn-primary" onClick={() => updateSellStatus(req._id, 'Completed')}>Mark Completed</button>
-                                            )}
-                                            {req.status === 'Rejected' && (
-                                                <span className="text-muted" style={{ fontSize: '0.85rem' }}>No actions</span>
-                                            )}
-                                            {req.status === 'Completed' && (
-                                                <span className="text-success" style={{ fontSize: '0.85rem' }}>Done</span>
-                                            )}
+                                            <select 
+                                                value={req.status || 'Pending'} 
+                                                onChange={(e) => updateSellStatus(req._id, e.target.value)}
+                                                className="status-select"
+                                            >
+                                                <option value="Pending">Pending</option>
+                                                <option value="Approved">Approved</option>
+                                                <option value="Rejected">Rejected</option>
+                                                <option value="Completed">Completed</option>
+                                            </select>
                                         </td>
                                     </tr>
                                 ))}
@@ -1139,6 +1269,9 @@ function AdminDashboard() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                             <h2 style={{ margin: 0 }}>Service Bookings</h2>
                             <div style={{ display: 'flex', gap: '8px' }}>
+                                <button onClick={downloadServiceBookingsCSV} className="btn-sm btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', padding: '0.5rem 1rem' }}>
+                                    📥 Export CSV
+                                </button>
                                 <button 
                                     className={`btn ${serviceViewMode === 'list' ? 'btn-primary' : 'btn-secondary'}`}
                                     onClick={() => setServiceViewMode('list')}
@@ -1194,11 +1327,11 @@ function AdminDashboard() {
                                 {filteredServiceBookings.map(booking => (
                                     <tr key={booking._id}>
                                         <td>
-                                            <div>{booking.name}</div>
-                                            <small>{booking.phone}</small>
+                                            <div><HighlightText text={booking.name} highlight={searchTerm} /></div>
+                                            <small><HighlightText text={booking.phone} highlight={searchTerm} /></small>
                                         </td>
-                                        <td>{booking.brand}</td>
-                                        <td>{booking.issue}</td>
+                                        <td><HighlightText text={booking.brand} highlight={searchTerm} /></td>
+                                        <td><HighlightText text={booking.issue} highlight={searchTerm} /></td>
                                         <td>{new Date(booking.preferredDate).toLocaleDateString()}</td>
                                         <td><span className={`status-badge ${booking.status ? booking.status.toLowerCase().replace(' ', '-') : 'pending'}`}>{booking.status || 'Pending'}</span></td>
                                         <td>
@@ -1302,14 +1435,14 @@ function AdminDashboard() {
                                 {filteredContacts.map(contact => (
                                     <tr key={contact._id}>
                                         <td>
-                                            <div>{contact.name}</div>
-                                            <small>{contact.email}</small> <br/>
-                                            <small>{contact.phone}</small>
+                                            <div><HighlightText text={contact.name} highlight={searchTerm} /></div>
+                                            <small><HighlightText text={contact.email} highlight={searchTerm} /></small> <br/>
+                                            <small><HighlightText text={contact.phone} highlight={searchTerm} /></small>
                                         </td>
-                                        <td>{contact.subject}</td>
+                                        <td><HighlightText text={contact.subject} highlight={searchTerm} /></td>
                                         <td>
                                             <div className="message-content">
-                                                {(contact.message || '').substring(0, 50)}
+                                                <HighlightText text={(contact.message || '').substring(0, 50)} highlight={searchTerm} />
                                                 {(contact.message || '').length > 50 ? '...' : ''}
                                             </div>
                                         </td>
@@ -1486,6 +1619,17 @@ function AdminDashboard() {
                                                 </p>
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
+                                                <button 
+                                                    onClick={() => {
+                                                        const text = `Order ID: ${viewData.data.orderId || viewData.data._id}\nAmount: ₹${viewData.data.totalAmount}`;
+                                                        navigator.clipboard.writeText(text);
+                                                        toast.success('Order summary copied!');
+                                                    }}
+                                                    style={{ background: 'none', border: '1px solid #e2e8f0', padding: '0.3rem 0.6rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem', color: '#64748b', marginRight: '0.5rem' }}
+                                                    title="Copy Summary"
+                                                >
+                                                    📋 Copy
+                                                </button>
                                                 <span className={`status-badge ${viewData.data.status ? viewData.data.status.toLowerCase() : ''}`}>{viewData.data.status}</span>
                                                 <div style={{ marginTop: '0.5rem', fontWeight: 'bold', fontSize: '1.1rem', color: '#0f172a' }}>
                                                     Total: ₹{viewData.data.totalAmount}
@@ -1493,18 +1637,87 @@ function AdminDashboard() {
                                             </div>
                                         </div>
 
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+                                        {/* Status Stepper */}
+                                        <div style={{ marginBottom: '2rem', padding: '1rem', background: '#f8fafc', borderRadius: '8px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
+                                                {['pending', 'confirmed', 'shipped', 'delivered'].map((step, index) => {
+                                                    const currentStatus = (viewData.data.status || 'pending').toLowerCase();
+                                                    const steps = ['pending', 'confirmed', 'shipped', 'delivered'];
+                                                    const currentIndex = steps.indexOf(currentStatus);
+                                                    const isCompleted = index <= currentIndex;
+                                                    const isCurrent = index === currentIndex;
+                                                    
+                                                    // Handle cancelled/completed separately if needed, but for linear flow:
+                                                    if (currentStatus === 'cancelled') return null;
+
+                                                    return (
+                                                        <div key={step} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 1, width: '25%' }}>
+                                                            <div style={{ 
+                                                                width: '30px', height: '30px', borderRadius: '50%', 
+                                                                background: isCompleted ? '#10b981' : '#e2e8f0',
+                                                                color: isCompleted ? 'white' : '#94a3b8',
+                                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                                fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '0.5rem',
+                                                                border: isCurrent ? '3px solid #d1fae5' : 'none'
+                                                            }}>
+                                                                {isCompleted ? '✓' : index + 1}
+                                                            </div>
+                                                            <span style={{ fontSize: '0.8rem', color: isCompleted ? '#0f172a' : '#94a3b8', fontWeight: isCompleted ? '600' : '400', textTransform: 'capitalize' }}>
+                                                                {step}
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                })}
+                                                {/* Progress Line */}
+                                                {(viewData.data.status || '').toLowerCase() !== 'cancelled' && (
+                                                    <div style={{ 
+                                                        position: 'absolute', top: '15px', left: '12%', right: '12%', height: '2px', background: '#e2e8f0', zIndex: 0 
+                                                    }}>
+                                                        <div style={{ 
+                                                            height: '100%', background: '#10b981', transition: 'width 0.3s ease',
+                                                            width: `${(['pending', 'confirmed', 'shipped', 'delivered'].indexOf((viewData.data.status || 'pending').toLowerCase()) / 3) * 100}%`
+                                                        }}></div>
+                                                    </div>
+                                                )}
+                                                {(viewData.data.status || '').toLowerCase() === 'cancelled' && (
+                                                    <div style={{ width: '100%', textAlign: 'center', color: '#ef4444', fontWeight: 'bold' }}>
+                                                        🚫 Order Cancelled
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
                                             <div>
                                                 <h5 style={{ color: '#475569', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', borderBottom: '2px solid #e2e8f0', paddingBottom: '0.5rem' }}>Customer Details</h5>
                                                 <div style={{ fontSize: '0.95rem', lineHeight: '1.6' }}>
-                                                    <p style={{ margin: 0 }}><strong>Name:</strong> {viewData.data.shippingDetails?.name}</p>
-                                                    <p style={{ margin: 0 }}><strong>Email:</strong> {viewData.data.shippingDetails?.email}</p>
-                                                    <p style={{ margin: 0 }}><strong>Phone:</strong> {viewData.data.shippingDetails?.phone}</p>
-                                                    <p style={{ margin: '0.5rem 0 0' }}><strong>Address:</strong><br/>
-                                                        {viewData.data.shippingDetails?.address},<br/>
-                                                        {viewData.data.shippingDetails?.city} - {viewData.data.shippingDetails?.pincode},<br/>
-                                                        {viewData.data.shippingDetails?.state}
+                                                    <p style={{ margin: '0 0 0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                        <span style={{ fontSize: '1.2rem' }}>👤</span> <strong>{viewData.data.shippingDetails?.name}</strong>
                                                     </p>
+                                                    <p style={{ margin: '0 0 0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                        <span style={{ fontSize: '1.2rem' }}>📧</span> 
+                                                        <a href={`mailto:${viewData.data.shippingDetails?.email}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
+                                                            {viewData.data.shippingDetails?.email}
+                                                        </a>
+                                                    </p>
+                                                    <p style={{ margin: '0 0 0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                        <span style={{ fontSize: '1.2rem' }}>📱</span> 
+                                                        <span>{viewData.data.shippingDetails?.phone}</span>
+                                                        <a href={`https://wa.me/91${viewData.data.shippingDetails?.phone}`} target="_blank" rel="noreferrer" title="Chat on WhatsApp" style={{ textDecoration: 'none' }}>
+                                                            <span style={{ background: '#25D366', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' }}>WA</span>
+                                                        </a>
+                                                        <a href={`tel:${viewData.data.shippingDetails?.phone}`} title="Call Customer" style={{ textDecoration: 'none' }}>
+                                                            <span style={{ background: '#3b82f6', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' }}>Call</span>
+                                                        </a>
+                                                    </p>
+                                                    <div style={{ margin: '0.5rem 0 0', display: 'flex', gap: '0.5rem' }}>
+                                                        <span style={{ fontSize: '1.2rem' }}>📍</span>
+                                                        <p style={{ margin: 0 }}>
+                                                            {viewData.data.shippingDetails?.address},<br/>
+                                                            {viewData.data.shippingDetails?.city} - {viewData.data.shippingDetails?.pincode},<br/>
+                                                            {viewData.data.shippingDetails?.state}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div>
@@ -1512,68 +1725,59 @@ function AdminDashboard() {
                                                 <div style={{ fontSize: '0.95rem', lineHeight: '1.6' }}>
                                                     <p style={{ margin: 0 }}><strong>Method:</strong> {viewData.data.paymentMethod?.toUpperCase()}</p>
                                                     <p style={{ margin: 0 }}><strong>Status:</strong> <span className={`status-badge ${viewData.data.paymentStatus || 'pending'}`} style={{ transform: 'scale(0.9)', transformOrigin: 'left center' }}>{viewData.data.paymentStatus || 'Pending'}</span></p>
-                                                    <p style={{ margin: '0.5rem 0 0', wordBreak: 'break-all' }}><strong>Transaction ID:</strong><br/>{viewData.data.transactionId || viewData.data.paymentId || 'N/A'}</p>
+                                                    <p style={{ margin: '0.5rem 0 0', wordBreak: 'break-all' }}>
+                                                        <strong>Transaction ID:</strong><br/>
+                                                        <span style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace' }}>
+                                                            {viewData.data.transactionId || viewData.data.paymentId || 'N/A'}
+                                                        </span>
+                                                        {(viewData.data.transactionId || viewData.data.paymentId) && (
+                                                            <button 
+                                                                onClick={() => {
+                                                                    navigator.clipboard.writeText(viewData.data.transactionId || viewData.data.paymentId);
+                                                                    toast.success('Transaction ID copied');
+                                                                }}
+                                                                style={{ border: 'none', background: 'none', cursor: 'pointer', marginLeft: '5px' }}
+                                                                title="Copy ID"
+                                                            >
+                                                                📋
+                                                            </button>
+                                                        )}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <h5 style={{ color: '#475569', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem', borderBottom: '2px solid #e2e8f0', paddingBottom: '0.5rem' }}>Order Items</h5>
-                                        <table className="admin-table" style={{ marginTop: '0' }}>
-                                            <thead>
-                                                <tr>
-                                                    <th>Item</th>
-                                                    <th>Unit Price</th>
-                                                    <th>Qty</th>
-                                                    <th style={{ textAlign: 'right' }}>Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {viewData.data.items.map((item, idx) => (
-                                                    <tr key={idx}>
-                                                        <td>
-                                                            <div style={{ fontWeight: '500' }}>{item.name}</div>
-                                                            <small style={{ color: '#64748b' }}>{item.brand}</small>
-                                                        </td>
-                                                        <td>₹{item.price}</td>
-                                                        <td>{item.quantity}</td>
-                                                        <td style={{ textAlign: 'right', fontWeight: 'bold' }}>₹{item.price * item.quantity}</td>
+                                        <div style={{ overflowX: 'auto' }}>
+                                            <table className="admin-table" style={{ marginTop: '0', minWidth: 'auto', width: '100%' }}>
+                                                <thead>
+                                                    <tr>
+                                                        <th style={{ textAlign: 'left' }}>Item</th>
+                                                        <th style={{ textAlign: 'center' }}>Unit Price</th>
+                                                        <th style={{ textAlign: 'center' }}>Qty</th>
+                                                        <th style={{ textAlign: 'right' }}>Total</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                            <tfoot>
-                                                <tr style={{ background: '#f8fafc' }}>
-                                                    <td colSpan="3" style={{ textAlign: 'right', fontWeight: 'bold', paddingRight: '1rem' }}>Grand Total:</td>
-                                                    <td style={{ textAlign: 'right', fontWeight: 'bold', fontSize: '1.1rem', color: '#0f172a' }}>₹{viewData.data.totalAmount}</td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
-
-                                        <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '1rem' }}>
-                                            <span style={{ fontWeight: '600', color: '#475569' }}>Update Order Status:</span>
-                                            <select 
-                                                value={viewData.data.status} 
-                                                onChange={(e) => {
-                                                    const newStatus = e.target.value;
-                                                    updateOrderStatus(viewData.data._id, newStatus);
-                                                    setViewData({ ...viewData, data: { ...viewData.data, status: newStatus } });
-                                                }}
-                                                style={{ 
-                                                    padding: '0.6rem 1rem', 
-                                                    borderRadius: '6px', 
-                                                    border: '1px solid #cbd5e1',
-                                                    fontSize: '0.95rem',
-                                                    backgroundColor: 'white',
-                                                    cursor: 'pointer',
-                                                    minWidth: '150px'
-                                                }}
-                                            >
-                                                <option value="pending">Pending</option>
-                                                <option value="confirmed">Confirmed</option>
-                                                <option value="shipped">Shipped</option>
-                                                <option value="delivered">Delivered</option>
-                                                <option value="cancelled">Cancelled</option>
-                                                <option value="completed">Completed</option>
-                                            </select>
+                                                </thead>
+                                                <tbody>
+                                                    {viewData.data.items.map((item, idx) => (
+                                                        <tr key={idx}>
+                                                            <td>
+                                                                <div style={{ fontWeight: '500' }}>{item.name}</div>
+                                                                <small style={{ color: '#64748b' }}>{item.brand}</small>
+                                                            </td>
+                                                            <td style={{ textAlign: 'center' }}>₹{item.price}</td>
+                                                            <td style={{ textAlign: 'center' }}>{item.quantity}</td>
+                                                            <td style={{ textAlign: 'right', fontWeight: 'bold' }}>₹{item.price * item.quantity}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr style={{ background: '#f8fafc' }}>
+                                                        <td colSpan="3" style={{ textAlign: 'right', fontWeight: 'bold', paddingRight: '1rem' }}>Grand Total:</td>
+                                                        <td style={{ textAlign: 'right', fontWeight: 'bold', fontSize: '1.1rem', color: '#0f172a' }}>₹{viewData.data.totalAmount}</td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
                                         </div>
                                     </div>
                                 )}
@@ -1583,7 +1787,15 @@ function AdminDashboard() {
                                         <h4>User Information</h4>
                                         <p><strong>Name:</strong> {viewData.data.name}</p>
                                         <p><strong>Email:</strong> {viewData.data.email}</p>
-                                        <p><strong>Phone:</strong> {viewData.data.phone}</p>
+                                        <p style={{ display: 'flex', alignItems: 'center' }}>
+                                            <strong>Phone:</strong> <span style={{ marginLeft: '5px' }}>{viewData.data.phone}</span>
+                                            <a href={`https://wa.me/91${viewData.data.phone}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', marginLeft: '10px' }}>
+                                                <span style={{ background: '#25D366', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>💬 WhatsApp</span>
+                                            </a>
+                                            <a href={`tel:${viewData.data.phone}`} style={{ textDecoration: 'none', marginLeft: '8px' }}>
+                                                <span style={{ background: '#3b82f6', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📞 Call</span>
+                                            </a>
+                                        </p>
                                         
                                         <h4 style={{ marginTop: '1rem' }}>Machine Details</h4>
                                         <p><strong>Type:</strong> {viewData.data.machineType}</p>
@@ -1626,7 +1838,15 @@ function AdminDashboard() {
                                         <h4>Customer Information</h4>
                                         <p><strong>Name:</strong> {viewData.data.name}</p>
                                         <p><strong>Email:</strong> {viewData.data.email}</p>
-                                        <p><strong>Phone:</strong> {viewData.data.phone}</p>
+                                        <p style={{ display: 'flex', alignItems: 'center' }}>
+                                            <strong>Phone:</strong> <span style={{ marginLeft: '5px' }}>{viewData.data.phone}</span>
+                                            <a href={`https://wa.me/91${viewData.data.phone}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', marginLeft: '10px' }}>
+                                                <span style={{ background: '#25D366', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>💬 WhatsApp</span>
+                                            </a>
+                                            <a href={`tel:${viewData.data.phone}`} style={{ textDecoration: 'none', marginLeft: '8px' }}>
+                                                <span style={{ background: '#3b82f6', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📞 Call</span>
+                                            </a>
+                                        </p>
                                         <p><strong>Address:</strong> {viewData.data.address}</p>
 
                                         <h4 style={{ marginTop: '1rem' }}>Service Details</h4>
@@ -1654,8 +1874,53 @@ function AdminDashboard() {
                                 )}
                             </div>
 
-                            <div className="modal-footer">
-                                <button className="btn btn-secondary" onClick={() => setViewData(null)}>Close</button>
+                            <div className="modal-footer" style={{ padding: '1.5rem', background: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                {viewData.type === 'order' ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <span style={{ fontWeight: '600', color: '#475569' }}>Update Order Status:</span>
+                                        <select 
+                                            value={viewData.data.status} 
+                                            onChange={(e) => {
+                                                const newStatus = e.target.value;
+                                                updateOrderStatus(viewData.data._id, newStatus);
+                                                setViewData({ ...viewData, data: { ...viewData.data, status: newStatus } });
+                                            }}
+                                            style={{ 
+                                                padding: '0.6rem 1rem', 
+                                                borderRadius: '6px', 
+                                                border: '1px solid #cbd5e1',
+                                                fontSize: '0.95rem',
+                                                backgroundColor: 'white',
+                                                cursor: 'pointer',
+                                                minWidth: '150px'
+                                            }}
+                                        >
+                                            <option value="pending">Pending</option>
+                                            <option value="confirmed">Confirmed</option>
+                                            <option value="shipped">Shipped</option>
+                                            <option value="delivered">Delivered</option>
+                                            <option value="cancelled">Cancelled</option>
+                                            <option value="completed">Completed</option>
+                                        </select>
+                                    </div>
+                                ) : (
+                                    <div></div>
+                                )}
+                                <button 
+                                    className="btn btn-secondary" 
+                                    onClick={() => setViewData(null)}
+                                    style={{
+                                        padding: '0.6rem 1.5rem',
+                                        background: '#334155',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer',
+                                        fontWeight: '500'
+                                    }}
+                                >
+                                    Close
+                                </button>
                             </div>
                         </div>
                     </div>

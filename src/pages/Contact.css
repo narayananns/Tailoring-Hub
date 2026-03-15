@@ -184,48 +184,6 @@
     font-size: 1.05rem;
 }
 
-/* Map Section */
-.map-section {
-    margin-top: 0;
-}
-
-.map-placeholder {
-    height: 350px;
-    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.map-placeholder::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--gradient-mesh);
-    opacity: 0.3;
-}
-
-.map-content {
-    text-align: center;
-    position: relative;
-    z-index: 1;
-}
-
-.map-content span {
-    font-size: 5rem;
-    display: block;
-    margin-bottom: 1.25rem;
-    filter: drop-shadow(0 0 20px rgba(217, 119, 6, 0.2));
-}
-
-.map-content p {
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-size: 0.9rem;
-}
 
 @media (max-width: 1024px) {
     .contact-layout {

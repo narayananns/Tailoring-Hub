@@ -8,17 +8,18 @@ const { sendOTP, sendWelcomeEmail } = require('../utils/emailService');
 
 const router = express.Router();
 
-// JWT & Admin Configuration
+// JWT Secret - In production, use environment variable
 const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_CODE = process.env.ADMIN_CODE;
 
 if (!JWT_SECRET || !ADMIN_CODE) {
-    console.warn("⚠️  JWT_SECRET or ADMIN_CODE is missing in .env! Things may break.");
+    if (process.env.NODE_ENV === 'production') {
+        throw new Error("JWT_SECRET and ADMIN_CODE must be set in production");
+    }
 }
 
 // Generate JWT Token
 const generateToken = (userId) => {
-    if (!JWT_SECRET) throw new Error("JWT_SECRET is not defined!");
     return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: '7d' });
 };
 

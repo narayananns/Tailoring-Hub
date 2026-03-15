@@ -103,8 +103,15 @@ function Sell() {
                 submitData.append('photos', photo)
             })
 
+            const token = localStorage.getItem('token')
+            const headers = {}
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`
+            }
+
             const response = await fetch('/api/sell-requests', {
                 method: 'POST',
+                headers, // Include headers
                 body: submitData
             })
 

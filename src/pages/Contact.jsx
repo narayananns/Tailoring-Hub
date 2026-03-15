@@ -230,15 +230,7 @@ function Contact() {
                 </div>
             </section>
 
-            {/* Map Placeholder */}
-            <section className="map-section">
-                <div className="map-placeholder">
-                    <div className="map-content">
-                        <span>🗺️</span>
-                        <p>Map will be integrated here</p>
-                    </div>
-                </div>
-            </section>
+
         </div>
     )
 }

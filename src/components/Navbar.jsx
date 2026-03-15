@@ -174,10 +174,17 @@ function Navbar() {
                                             <span>👤</span> My Profile
                                         </Link>
                                         {user.role !== 'admin' && (
-                                            <Link to="/my-orders" className="profile-dropdown-item" onClick={closeMenu}>
-                                                <span>📦</span> My Orders
-                                            </Link>
+                                            <>
+                                                <div className="profile-dropdown-divider"></div>
+                                                <Link to="/my-orders" className="profile-dropdown-item" onClick={closeMenu}>
+                                                    <span>📦</span> My Orders
+                                                </Link>
+                                                <Link to="/my-sell-requests" className="profile-dropdown-item" onClick={closeMenu}>
+                                                    <span>🏷️</span> My Sell Requests
+                                                </Link>
+                                            </>
                                         )}
+                                        <div className="profile-dropdown-divider"></div>
                                         <button className="profile-dropdown-item logout" onClick={handleLogout}>
                                             <span>🚪</span> Logout
                                         </button>

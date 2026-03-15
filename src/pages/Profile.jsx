@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import Skeleton from 'react-loading-skeleton'
 import Spinner from '../components/Spinner'
 import './Profile.css'
 
@@ -167,7 +168,26 @@ function Profile() {
     if (loading) {
         return (
             <div className="profile-page">
-                <Spinner size="large" />
+                <div className="profile-container">
+                    <div className="profile-card">
+                        <div className="profile-header">
+                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+                                <Skeleton circle height={100} width={100} baseColor="#202020" highlightColor="#444" />
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <Skeleton height={40} width={250} style={{ marginBottom: '10px' }} baseColor="#202020" highlightColor="#444" />
+                                <Skeleton height={20} width={150} baseColor="#202020" highlightColor="#444" />
+                            </div>
+                        </div>
+                        <div className="profile-details-grid" style={{ marginTop: '2rem' }}>
+                            <Skeleton count={3} height={60} style={{ marginBottom: '15px' }} baseColor="#202020" highlightColor="#444" />
+                        </div>
+                        <div className="profile-actions" style={{ marginTop: '2rem', display: 'flex', gap: '15px' }}>
+                            <div style={{ flex: 1 }}><Skeleton height={50} borderRadius={8} baseColor="#202020" highlightColor="#444" /></div>
+                            <div style={{ flex: 1 }}><Skeleton height={50} borderRadius={8} baseColor="#202020" highlightColor="#444" /></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         )
     }

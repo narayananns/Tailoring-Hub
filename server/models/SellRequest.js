@@ -58,6 +58,10 @@ const sellRequestSchema = new mongoose.Schema({
         enum: ['Pending', 'Approved', 'Rejected', 'Completed'],
         default: 'Pending'
     },
+    rejectionReason: {
+        type: String,
+        default: ''
+    },
     createdAt: {
         type: Date,
         default: Date.now

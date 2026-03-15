@@ -3,6 +3,8 @@ import { AnimatePresence } from 'framer-motion'
 import { Toaster } from 'react-hot-toast'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import ScrollToTop from './components/ScrollToTop'
+import BackToTop from './components/BackToTop'
 import PageTransition from './components/PageTransition'
 import Home from './pages/Home'
 import Buy from './pages/Buy'
@@ -21,6 +23,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import AdminOrderDetails from './pages/AdminOrderDetails'
 import Profile from './pages/Profile'
 import MyOrders from './pages/MyOrders'
+import MySellRequests from './pages/MySellRequests'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import './App.css'
@@ -33,12 +36,14 @@ function App() {
 
   return (
     <div className="app">
+      <ScrollToTop />
       <Toaster position="top-center" toastOptions={{
         style: {
           background: '#333',
           color: '#fff',
         },
       }} />
+      <BackToTop />
       {!isAdminLayout && <Navbar />}
       <main className={isAdminLayout ? "" : "main-content"}>
         <AnimatePresence mode="wait">
@@ -46,6 +51,7 @@ function App() {
             <Route path="/" element={<PageTransition><Home /></PageTransition>} />
             <Route path="/buy" element={<PageTransition><Buy /></PageTransition>} />
             <Route path="/sell" element={<PageTransition><Sell /></PageTransition>} />
+            <Route path="/my-sell-requests" element={<PageTransition><MySellRequests /></PageTransition>} />
             <Route path="/service" element={<PageTransition><Service /></PageTransition>} />
             <Route path="/about" element={<PageTransition><About /></PageTransition>} />
             <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />

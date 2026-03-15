@@ -12,12 +12,7 @@ dotenv.config();
 const app = express();
 
 // MongoDB Connection
-const MONGO_URI = process.env.MONGO_URI;
-
-if (!MONGO_URI) {
-    console.error('❌ MONGO_URI is missing in environment variables!');
-    process.exit(1);
-}
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/tmms';
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log('✅ Connected to MongoDB'))
