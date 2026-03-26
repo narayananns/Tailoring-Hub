@@ -4,11 +4,17 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
-// Initialize Razorpay instance
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET
-});
+// Lazy initialize Razorpay instance (only when keys are available)
+let razorpay = null;
+const getRazorpayInstance = () => {
+    if (!razorpay && process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+        razorpay = new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET
+        });
+    }
+    return razorpay;
+};
 
 const JWT_SECRET = process.env.JWT_SECRET || 'tmms-dev-secret';
 const User = require('../models/User');
@@ -44,6 +50,11 @@ const verifyToken = async (req, res, next) => {
 // Create Razorpay Order
 router.post('/create-order', verifyToken, async (req, res) => {
     try {
+        const razorpayInstance = getRazorpayInstance();
+        if (!razorpayInstance) {
+            return res.status(500).json({ message: 'Razorpay is not configured' });
+        }
+
         const { amount, currency = 'INR', receipt } = req.body;
 
         if (!amount) {
@@ -59,7 +70,7 @@ router.post('/create-order', verifyToken, async (req, res) => {
         };
 
         // Create Razorpay order
-        const order = await razorpay.orders.create(options);
+        const order = await razorpayInstance.orders.create(options);
 
         res.json({
             success: true,
@@ -127,8 +138,13 @@ router.post('/verify', async (req, res) => {
 // Get payment details
 router.get('/payment/:paymentId', verifyToken, async (req, res) => {
     try {
+        const razorpayInstance = getRazorpayInstance();
+        if (!razorpayInstance) {
+            return res.status(500).json({ message: 'Razorpay is not configured' });
+        }
+
         const { paymentId } = req.params;
-        const payment = await razorpay.payments.fetch(paymentId);
+        const payment = await razorpayInstance.payments.fetch(paymentId);
 
         res.json({
             success: true,
