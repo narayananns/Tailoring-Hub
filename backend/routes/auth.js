@@ -137,7 +137,8 @@ router.post('/resend-otp', async (req, res) => {
 
         res.json({ message: 'OTP resent successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Failed to resend OTP' });
+        console.error('Resend OTP error:', error);
+        res.status(500).json({ message: 'Failed to resend OTP', error: error.message });
     }
 });
 
