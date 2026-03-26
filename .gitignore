@@ -13,8 +13,8 @@ dist-ssr
 *.local
 
 # Environment variables (NEVER commit these!)
-.env
-server/.env
+frontend/.env
+backend/.env
 *.env.local
 
 # Editor directories and files
@@ -29,5 +29,5 @@ server/.env
 *.sw?
 
 # Uploads
-server/uploads/*
-!server/uploads/.gitkeep
+backend/uploads/*
+!backend/uploads/.gitkeep

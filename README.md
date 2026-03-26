@@ -2,6 +2,12 @@
 
 A comprehensive, full-stack web application designed to digitize and streamline the operations of a tailoring machine business. This system facilitates buying, selling, and servicing tailoring machines with a robust Admin Dashboard for complete business management.
 
+## Project Structure
+
+The project is organized into two main directories:
+- **frontend/**: Contains the React frontend application (Vite).
+- **backend/**: Contains the Node.js/Express backend server.
+
 ## 🌟 Key Features
 
 ### 🛍️ Client Applications
