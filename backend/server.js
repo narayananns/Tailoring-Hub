@@ -64,7 +64,7 @@ app.use(express.json());
 app.use('/uploads', express.static(uploadsDir));
 
 // Import Routes
-const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orders');
 const paymentRoutes = require('./routes/payment');
 const sellRoutes = require('./routes/sell');
@@ -82,6 +82,10 @@ app.use('/api/contacts', contactRoutes);
 app.use('/api/machines', machineRoutes);
 
 // Basic route
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'API working' });
+});
+
 app.get('/api', (req, res) => {
     res.json({
         message: 'Welcome to TMMS API',
@@ -110,6 +114,15 @@ app.get('/api/spare-parts', (req, res) => {
     res.json({
         message: 'Spare parts endpoint',
         data: []
+    });
+});
+
+// Error Handling Middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({
+        success: false,
+        message: err.message || 'Internal Server Error'
     });
 });
 
