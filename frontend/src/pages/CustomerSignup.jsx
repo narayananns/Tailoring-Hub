@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
 import apiClient from '../utils/api'
 import './Auth.css'
 
@@ -64,7 +63,7 @@ function CustomerSignup() {
         }
 
         try {
-            const response = await axios.post('/api/auth/customer/register', {
+            const response = await apiClient.post('/api/auth/customer/register', {
                 name: formData.name,
                 email: formData.email,
                 phone: formData.phone,
@@ -81,7 +80,9 @@ function CustomerSignup() {
                 setError(data.message || 'Registration failed')
             }
         } catch (err) {
-            setError('Failed to connect to server')
+            console.error('Registration error:', err);
+            const errorMessage = err.response?.data?.message || err.message || 'Failed to register';
+            setError(errorMessage);
         } finally {
             setIsLoading(false)
         }

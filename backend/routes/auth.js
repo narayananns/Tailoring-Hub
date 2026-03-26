@@ -35,6 +35,27 @@ router.post('/customer/register', async (req, res) => {
     try {
         const { name, email, phone, password } = req.body;
 
+        // Validate required fields
+        if (!name || !email || !phone || !password) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ message: 'Invalid email format' });
+        }
+
+        // Validate phone format
+        if (!/^\d{10}$/.test(phone)) {
+            return res.status(400).json({ message: 'Phone number must be exactly 10 digits' });
+        }
+
+        // Validate password length
+        if (password.length < 6) {
+            return res.status(400).json({ message: 'Password must be at least 6 characters' });
+        }
+
         // Check if user exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -66,6 +87,8 @@ router.post('/customer/register', async (req, res) => {
     } catch (error) {
         console.error('Customer registration error:', error);
         res.status(500).json({ message: 'Registration failed', error: error.message });
+    }
+});
     }
 });
 
