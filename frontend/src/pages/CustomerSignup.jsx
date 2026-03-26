@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import apiClient from '../utils/api'
 import './Auth.css'
 
 function CustomerSignup() {
@@ -62,22 +64,16 @@ function CustomerSignup() {
         }
 
         try {
-            const response = await fetch('/api/auth/customer/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: formData.name,
-                    email: formData.email,
-                    phone: formData.phone,
-                    password: formData.password
-                })
+            const response = await axios.post('/api/auth/customer/register', {
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                password: formData.password
             })
 
-            const data = await response.json()
+            const data = response.data
 
-            if (response.ok) {
+            if (response.status === 201) {
                 setStep(2)
                 setSuccessMessage('Account created! Please enter the code sent to your email.')
                 setResendTimer(60)
@@ -97,20 +93,14 @@ function CustomerSignup() {
         setError('')
 
         try {
-            const response = await fetch('/api/auth/verify-email', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: formData.email,
-                    otp
-                })
+            const response = await apiClient.post('/api/auth/verify-email', {
+                email: formData.email,
+                otp
             })
 
-            const data = await response.json()
+            const data = response.data
 
-            if (response.ok) {
+            if (response.status === 200) {
                 localStorage.setItem('token', data.token)
                 localStorage.setItem('user', JSON.stringify(data.user))
                 setSuccessMessage('Verification Successful! Logging in...')
@@ -121,7 +111,7 @@ function CustomerSignup() {
                 setError(data.message || 'Verification failed')
             }
         } catch (err) {
-            setError('Failed to connect to server')
+            setError(err.response?.data?.message || 'Failed to connect to server')
         } finally {
             setIsLoading(false)
         }
@@ -132,22 +122,16 @@ function CustomerSignup() {
 
         setIsLoading(true)
         try {
-            const response = await fetch('/api/auth/resend-otp', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email: formData.email })
-            })
+            const response = await apiClient.post('/api/auth/resend-otp', { email: formData.email })
 
-            if (response.ok) {
+            if (response.status === 200) {
                 setSuccessMessage('Code resent successfully')
                 setResendTimer(60)
             } else {
                 setError('Failed to resend code')
             }
         } catch (err) {
-            setError('Failed to connect to server')
+            setError(err.response?.data?.message || 'Failed to connect to server')
         } finally {
             setIsLoading(false)
         }

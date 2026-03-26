@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import apiClient from '../utils/api'
 import './Auth.css'
 
 function CustomerLogin() {
@@ -25,17 +26,11 @@ function CustomerLogin() {
         setError('')
 
         try {
-            const response = await fetch('/api/auth/customer/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            })
+            const response = await apiClient.post('/api/auth/customer/login', formData)
 
-            const data = await response.json()
+            const data = response.data
 
-            if (response.ok) {
+            if (response.status === 200) {
                 localStorage.setItem('token', data.token)
                 localStorage.setItem('user', JSON.stringify(data.user))
                 navigate('/')
@@ -52,7 +47,7 @@ function CustomerLogin() {
                 }
             }
         } catch (err) {
-            setError('Failed to connect to server')
+            setError(err.response?.data?.message || 'Failed to connect to server')
         } finally {
             setIsLoading(false)
         }
