@@ -33,12 +33,14 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
-        console.error('❌ API Error:', {
+        const errorData = {
             status: error.response?.status,
             message: error.response?.data?.message || error.message,
+            data: error.response?.data,
             url: error.config?.url,
             method: error.config?.method
-        });
+        };
+        console.error('❌ API Error:', errorData);
         
         if (error.response?.status === 401) {
             // Token expired or invalid

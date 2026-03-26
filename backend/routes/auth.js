@@ -86,6 +86,19 @@ router.post('/customer/register', async (req, res) => {
         });
     } catch (error) {
         console.error('Customer registration error:', error);
+        
+        // Handle Mongoose validation errors
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({ message: messages.join(', ') });
+        }
+        
+        // Handle duplicate key error (unique constraint)
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern)[0];
+            return res.status(400).json({ message: `${field} already exists` });
+        }
+        
         res.status(500).json({ message: 'Registration failed', error: error.message });
     }
 });

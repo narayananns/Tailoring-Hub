@@ -63,6 +63,13 @@ function CustomerSignup() {
         }
 
         try {
+            console.log('📝 Form data being sent:', {
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                password: '***'
+            });
+
             const response = await apiClient.post('/api/auth/customer/register', {
                 name: formData.name,
                 email: formData.email,
@@ -80,7 +87,9 @@ function CustomerSignup() {
                 setError(data.message || 'Registration failed')
             }
         } catch (err) {
-            console.error('Registration error:', err);
+            console.error('Registration error - Full object:', err);
+            console.error('Response data:', err.response?.data);
+            console.error('Error message:', err.response?.data?.message);
             const errorMessage = err.response?.data?.message || err.message || 'Failed to register';
             setError(errorMessage);
         } finally {
