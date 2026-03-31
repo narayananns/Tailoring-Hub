@@ -192,8 +192,8 @@ router.delete('/:id', auth, async (req, res) => {
 
         // Check if user owns the request or is admin (assuming admin check middleware or role check)
         // For now, let's just check ownership. In a real app, admins should bypass this check.
-        // Assuming req.user from auth middleware has role 'admin'
-        if (request.userId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+        // Assuming req.user from auth middleware has role 'admin' or 'super-admin'
+        if (request.userId.toString() !== req.user._id.toString() && req.user.role !== 'admin' && req.user.role !== 'super-admin') {
             return res.status(401).json({ message: 'Not authorized to delete this request' });
         }
 

@@ -76,6 +76,7 @@ const sellRoutes = require('./routes/sell');
 const serviceRoutes = require('./routes/service');
 const contactRoutes = require('./routes/contact');
 const machineRoutes = require('./routes/machines');
+const adminManagementRoutes = require('./routes/adminManagement');
 
 // Use Routes
 app.use('/api/auth', authRoutes);
@@ -85,6 +86,7 @@ app.use('/api/sell-requests', sellRoutes);
 app.use('/api/service-bookings', serviceRoutes);
 app.use('/api/contacts', contactRoutes);
 app.use('/api/machines', machineRoutes);
+app.use('/api/admin-management', adminManagementRoutes);
 
 // Basic route
 app.get('/api/test', (req, res) => {

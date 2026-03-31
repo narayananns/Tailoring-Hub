@@ -83,9 +83,9 @@ function Navbar() {
     }, [])
 
     return (
-        <nav className={`navbar ${user?.role === 'admin' ? 'admin-navbar' : ''}`}>
+        <nav className={`navbar ${(user?.role === 'admin' || user?.role === 'super-admin') ? 'admin-navbar' : ''}`}>
             <div className="container navbar-container">
-                <Link to={user?.role === 'admin' ? "/admin/dashboard" : "/"} className="navbar-brand" onClick={closeMenu}>
+                <Link to={(user?.role === 'admin' || user?.role === 'super-admin') ? "/admin/dashboard" : "/"} className="navbar-brand" onClick={closeMenu}>
                     <span className="brand-icon">⚙️</span>
                     <span className="brand-text">Running Trader</span>
                 </Link>
@@ -95,7 +95,7 @@ function Navbar() {
                 </button>
 
                 <div className={`navbar-menu ${isMenuOpen ? 'active' : ''}`}>
-                    {user?.role === 'admin' ? (
+                    {(user?.role === 'admin' || user?.role === 'super-admin') ? (
                         <>
                             <NavLink to="/admin/dashboard?tab=overview" className="nav-link" onClick={closeMenu}>
                                 Dashboard
@@ -138,7 +138,7 @@ function Navbar() {
 
                     <div className="nav-auth">
                         {/* Cart Icon - Hide for Admin */}
-                        {user?.role !== 'admin' && (
+                        {user?.role !== 'admin' && user?.role !== 'super-admin' && (
                             <Link to="/cart" className="cart-link" onClick={closeMenu}>
                                 <span className="cart-icon">🛒</span>
                                 {cartCount > 0 && (
@@ -151,7 +151,7 @@ function Navbar() {
                             <div className="profile-dropdown-container">
                                 <button className="profile-trigger" onClick={toggleProfile}>
                                     <span className="profile-avatar">
-                                        {user.role === 'admin' ? '🔐' : '👤'}
+                                        {(user.role === 'admin' || user.role === 'super-admin') ? '🔐' : '👤'}
                                     </span>
                                     <span className="profile-name">{user.name}</span>
                                     <span className={`profile-arrow ${isProfileOpen ? 'open' : ''}`}>▼</span>
@@ -161,19 +161,19 @@ function Navbar() {
                                     <div className="profile-dropdown">
                                         <div className="profile-dropdown-header">
                                             <span className="profile-dropdown-avatar">
-                                                {user.role === 'admin' ? '🔐' : '👤'}
+                                                {(user.role === 'admin' || user.role === 'super-admin') ? '🔐' : '👤'}
                                             </span>
                                             <div className="profile-dropdown-info">
                                                 <span className="profile-dropdown-name">{user.name}</span>
                                                 <span className="profile-dropdown-email">{user.email}</span>
-                                                <span className="profile-dropdown-role">{user.role === 'admin' ? 'Administrator' : 'Customer'}</span>
+                                                <span className="profile-dropdown-role">{(user.role === 'admin' || user.role === 'super-admin') ? 'Administrator' : 'Customer'}</span>
                                             </div>
                                         </div>
                                         <div className="profile-dropdown-divider"></div>
                                         <Link to="/profile" className="profile-dropdown-item" onClick={closeMenu}>
                                             <span>👤</span> My Profile
                                         </Link>
-                                        {user.role !== 'admin' && (
+                                        {user.role !== 'admin' && user.role !== 'super-admin' && (
                                             <>
                                                 <div className="profile-dropdown-divider"></div>
                                                 <Link to="/my-orders" className="profile-dropdown-item" onClick={closeMenu}>

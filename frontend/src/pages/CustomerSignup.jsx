@@ -63,11 +63,47 @@ function CustomerSignup() {
         }
 
         try {
-            console.log('📝 Form data being sent:', {
+            // First check if email already exists
+            const checkResponse = await apiClient.post('/api/auth/check-email', {
+                email: formData.email
+            })
+
+            const emailStatus = checkResponse.data
+
+            if (!emailStatus.available) {
+                // Email already registered
+                if (emailStatus.isVerified) {
+                    setError(
+                        <div>
+                            <p>📧 This email is already registered and verified.</p>
+                            <p style={{ marginTop: '10px' }}>
+                                <Link to="/customer/login" style={{ color: '#FFC107', textDecoration: 'underline', fontWeight: 'bold' }}>
+                                    → Login to your account
+                                </Link>
+                            </p>
+                        </div>
+                    )
+                } else {
+                    setError(
+                        <div>
+                            <p>📧 This email is registered but not verified yet.</p>
+                            <p style={{ marginTop: '10px' }}>
+                                <Link to="/verify-email" state={{ email: formData.email }} style={{ color: '#FFC107', textDecoration: 'underline', fontWeight: 'bold' }}>
+                                    → Verify your email to login
+                                </Link>
+                            </p>
+                        </div>
+                    )
+                }
+                setIsLoading(false)
+                return
+            }
+
+            // Email is available, proceed with registration
+            console.log('📝 Registering new account:', {
                 name: formData.name,
                 email: formData.email,
-                phone: formData.phone,
-                password: '***'
+                phone: formData.phone
             });
 
             const response = await apiClient.post('/api/auth/customer/register', {
@@ -81,17 +117,30 @@ function CustomerSignup() {
 
             if (response.status === 201) {
                 setStep(2)
-                setSuccessMessage('Account created! Please enter the code sent to your email.')
+                setSuccessMessage('✅ Account created! Check your email for the verification code.')
                 setResendTimer(60)
             } else {
                 setError(data.message || 'Registration failed')
             }
         } catch (err) {
-            console.error('Registration error - Full object:', err);
-            console.error('Response data:', err.response?.data);
-            console.error('Error message:', err.response?.data?.message);
-            const errorMessage = err.response?.data?.message || err.message || 'Failed to register';
-            setError(errorMessage);
+            console.error('Registration error:', err);
+            const errorData = err.response?.data
+            
+            // Better error messages
+            if (errorData?.message?.includes('already')) {
+                setError(
+                    <div>
+                        <p>📧 This email is already registered.</p>
+                        <p style={{ marginTop: '10px' }}>
+                            <Link to="/customer/login" style={{ color: '#FFC107', textDecoration: 'underline', fontWeight: 'bold' }}>
+                                → Try logging in instead
+                            </Link>
+                        </p>
+                    </div>
+                )
+            } else {
+                setError(errorData?.message || err.message || 'Failed to register. Please try again.');
+            }
         } finally {
             setIsLoading(false)
         }

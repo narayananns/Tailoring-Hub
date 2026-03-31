@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const User = require('../models/User');
+const Admin = require('../models/Admin');
 const { sendOTP, sendWelcomeEmail } = require('../utils/emailService');
 const { registerCustomer, loginCustomer } = require('../controllers/authController');
 
@@ -156,43 +157,74 @@ router.post('/reset-password', async (req, res) => {
 // Admin Registration
 router.post('/admin/register', async (req, res) => {
     try {
-        const { name, email, phone, password, adminCode } = req.body;
+        const { name, email, password, adminCode } = req.body;
+
+        // Validate required fields
+        if (!name || !email || !password || !adminCode) {
+            return res.status(400).json({ message: 'All fields (name, email, password, adminCode) are required' });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ message: 'Invalid email format' });
+        }
+
+        // Validate password length
+        if (password.length < 6) {
+            return res.status(400).json({ message: 'Password must be at least 6 characters' });
+        }
 
         // Verify admin code
         if (adminCode !== ADMIN_CODE) {
             return res.status(403).json({ message: 'Invalid admin access code' });
         }
 
-        // Check if user exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: 'Email already registered' });
+        // Check if admin already exists
+        const existingAdmin = await Admin.findOne({ email });
+        if (existingAdmin) {
+            return res.status(400).json({ message: 'Admin with this email already exists' });
         }
 
-        // Create admin
-        const user = await User.create({
+        // Create new admin
+        const newAdmin = await Admin.create({
             name,
             email,
-            phone,
             password,
-            role: 'admin'
+            adminCode,
+            role: 'admin',
+            status: 'active'
         });
 
         // Generate token
-        const token = generateToken(user._id);
+        const token = generateToken(newAdmin._id);
 
         res.status(201).json({
             message: 'Admin registration successful',
             token,
             user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role
+                id: newAdmin._id,
+                name: newAdmin.name,
+                email: newAdmin.email,
+                role: newAdmin.role,
+                status: newAdmin.status
             }
         });
     } catch (error) {
         console.error('Admin registration error:', error);
+        
+        // Handle Mongoose validation errors
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({ message: messages.join(', ') });
+        }
+        
+        // Handle duplicate key error
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern)[0];
+            return res.status(400).json({ message: `${field} already exists` });
+        }
+        
         res.status(500).json({ message: 'Registration failed', error: error.message });
     }
 });
@@ -202,36 +234,61 @@ router.post('/admin/login', async (req, res) => {
     try {
         const { email, password, adminCode } = req.body;
 
+        // Validate required fields
+        if (!email || !password || !adminCode) {
+            return res.status(400).json({ message: 'Email, password, and admin code are required' });
+        }
+
+        // Check if account is locked (brute force protection)
+        const admin = await Admin.findOne({ email }).select('+password +adminCode');
+        
+        if (!admin) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        if (admin.isLocked && admin.lockedUntil > new Date()) {
+            return res.status(403).json({ 
+                message: 'Account is locked due to too many failed attempts. Please try again later.',
+                lockedUntil: admin.lockedUntil
+            });
+        }
+
+        // Check if account is inactive or suspended
+        if (admin.status !== 'active') {
+            return res.status(403).json({ message: `Account is ${admin.status}. Contact administrator.` });
+        }
+
         // Verify admin code
-        if (adminCode !== ADMIN_CODE) {
+        const isAdminCodeValid = await admin.compareAdminCode(adminCode);
+        if (!isAdminCodeValid) {
+            await admin.incrementLoginAttempts();
             return res.status(403).json({ message: 'Invalid admin access code' });
         }
 
-        // Find admin user
-        const user = await User.findOne({ email, role: 'admin' });
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid credentials or not an admin' });
-        }
-
-        // Check password
-        const isMatch = await user.comparePassword(password);
-        if (!isMatch) {
+        // Verify password
+        const isPasswordValid = await admin.comparePassword(password);
+        if (!isPasswordValid) {
+            await admin.incrementLoginAttempts();
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
+        // Reset login attempts on successful login
+        await admin.resetLoginAttempts();
+
         // Generate token
-        const token = generateToken(user._id);
+        const token = generateToken(admin._id);
 
         res.json({
             message: 'Admin login successful',
             token,
             user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                profilePhoto: user.profilePhoto,
-                accountId: user.accountId
+                id: admin._id,
+                name: admin.name,
+                email: admin.email,
+                role: admin.role,
+                status: admin.status,
+                permissions: admin.permissions,
+                profilePhoto: admin.profilePhoto
             }
         });
     } catch (error) {

@@ -34,20 +34,32 @@ function CustomerLogin() {
                 localStorage.setItem('token', data.token)
                 localStorage.setItem('user', JSON.stringify(data.user))
                 navigate('/')
-            } else {
-                if (data.isVerified === false) {
-                    setError(
-                        <div>
-                            {data.message} <br />
-                            <Link to="/verify-email" state={{ email: formData.email }} style={{ color: 'white', textDecoration: 'underline' }}>Verify Now</Link>
-                        </div>
-                    )
-                } else {
-                    setError(data.message || 'Login failed')
-                }
             }
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to connect to server')
+            const errorData = err.response?.data
+            
+            // Handle unverified email case
+            if (err.response?.status === 403 && errorData?.needsVerification) {
+                setError(
+                    <div>
+                        <p>{errorData.message}</p>
+                        <Link 
+                            to="/verify-email" 
+                            state={{ email: formData.email }} 
+                            style={{ 
+                                color: '#FFC107', 
+                                textDecoration: 'underline',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            ✓ Verify Your Email Now
+                        </Link>
+                        <p style={{ marginTop: '10px', fontSize: '12px' }}>You'll need to enter the verification code sent to your email.</p>
+                    </div>
+                )
+            } else {
+                setError(errorData?.message || err.message || 'Failed to connect to server')
+            }
         } finally {
             setIsLoading(false)
         }

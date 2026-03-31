@@ -213,7 +213,7 @@ function Profile() {
                                 />
                             ) : null}
                             <span style={{ display: user.profilePhoto ? 'none' : 'block', fontSize: '2em' }}>
-                                {user.role === 'admin' ? '🔐' : '👤'}
+                                {(user.role === 'admin' || user.role === 'super-admin') ? '🔐' : '👤'}
                             </span>
                         </div>
                         <input
@@ -288,7 +288,7 @@ function Profile() {
                                 <label>Account Type</label>
                                 <div className="profile-value">
                                     <span className={`role-badge ${user.role}`}>
-                                        {user.role === 'admin' ? '🔐 Administrator' : '👤 Customer'}
+                                        {(user.role === 'admin' || user.role === 'super-admin') ? '🔐 Administrator' : '👤 Customer'}
                                     </span>
                                 </div>
                             </div>
@@ -326,8 +326,8 @@ function Profile() {
                             </>
                         ) : (
                             <>
-                                <button className="btn btn-secondary" onClick={() => navigate(user.role === 'admin' ? '/admin/dashboard' : '/')}>
-                                    ← {user.role === 'admin' ? 'Back to Dashboard' : 'Back to Home'}
+                                <button className="btn btn-secondary" onClick={() => navigate((user.role === 'admin' || user.role === 'super-admin') ? '/admin/dashboard' : '/')}>
+                                    ← {(user.role === 'admin' || user.role === 'super-admin') ? 'Back to Dashboard' : 'Back to Home'}
                                 </button>
                                 <button className="btn btn-danger" onClick={handleLogout}>
                                     🚪 Logout

@@ -4,6 +4,10 @@ import './AdminSidebar.css'
 
 const AdminSidebar = ({ activeTab, stats = {} }) => {
     const navigate = useNavigate()
+    
+    // Get admin info from localStorage to check if super-admin
+    const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : {}
+    const isSuperAdmin = user.isSuperAdmin || false
 
     const handleNavigation = (tab) => {
         navigate(`/admin/dashboard?tab=${tab}`)
@@ -72,6 +76,16 @@ const AdminSidebar = ({ activeTab, stats = {} }) => {
                 
                 <div className="admin-nav-divider"></div>
 
+                <button onClick={() => navigate('/admin-profile')}>
+                    👤 My Profile
+                </button>
+
+                {isSuperAdmin && (
+                    <button onClick={() => navigate('/admin-requests')}>
+                        👑 Admin Requests
+                    </button>
+                )}
+                
                 <button onClick={() => navigate('/')}>
                     🏠 Home Site
                 </button>

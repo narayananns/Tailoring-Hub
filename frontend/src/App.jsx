@@ -21,6 +21,8 @@ import AdminLogin from './pages/AdminLogin'
 import AdminSignup from './pages/AdminSignup'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminOrderDetails from './pages/AdminOrderDetails'
+import AdminProfile from './pages/AdminProfile'
+import SuperAdminRequests from './pages/SuperAdminRequests'
 import Profile from './pages/Profile'
 import MyOrders from './pages/MyOrders'
 import MySellRequests from './pages/MySellRequests'
@@ -32,7 +34,7 @@ function App() {
   const location = useLocation()
   
   // Check if current route should use Admin Layout (no public Navbar/Footer)
-  const isAdminLayout = location.pathname.startsWith('/admin/dashboard') || location.pathname.startsWith('/admin/orders');
+  const isAdminLayout = location.pathname.startsWith('/admin/dashboard') || location.pathname.startsWith('/admin/orders') || location.pathname === '/admin-profile' || location.pathname === '/admin-requests';
 
   return (
     <div className="app">
@@ -68,6 +70,8 @@ function App() {
             <Route path="/admin/signup" element={<PageTransition><AdminSignup /></PageTransition>} />
             <Route path="/admin/dashboard" element={<PageTransition><AdminDashboard /></PageTransition>} />
             <Route path="/admin/orders/:id" element={<PageTransition><AdminOrderDetails /></PageTransition>} />
+            <Route path="/admin-profile" element={<PageTransition><AdminProfile /></PageTransition>} />
+            <Route path="/admin-requests" element={<PageTransition><SuperAdminRequests /></PageTransition>} />
 
             {/* Profile Route */}
             <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />

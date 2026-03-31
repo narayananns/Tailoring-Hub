@@ -123,7 +123,7 @@ function AdminDashboard() {
         const token = localStorage.getItem('token')
         const user = JSON.parse(localStorage.getItem('user') || '{}')
         
-        if (!token || user.role !== 'admin') {
+        if (!token || (user.role !== 'admin' && user.role !== 'super-admin')) {
             toast.error('Access denied. Admin only.')
             navigate('/admin/login')
         }
